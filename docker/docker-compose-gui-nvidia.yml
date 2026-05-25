@@ -1,0 +1,10 @@
+services:
+  ros2_jazzy_turblebot3:
+    extends:
+      file: docker-compose-gui.yml
+      service: ros2_jazzy_turblebot3
+    environment:
+     - NVIDIA_VISIBLE_DEVICES=all
+     - NVIDIA_DRIVER_CAPABILITIES=all
+    runtime: nvidia
+

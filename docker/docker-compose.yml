@@ -28,13 +28,11 @@ services:
     # Required for accessing hardware
     #privileged: true
     tty: true
-    entrypoint: ["/usr/local/bin/workspace-entrypoint.sh"]
     volumes:
       # Required for accessing hardware
       #- /dev:/dev
       # Required for accessing storage media
       #- /media:/media
-      - ./entrypoint.sh:/usr/local/bin/workspace-entrypoint.sh:ro
       - ../src:${AMENT_WORKSPACE_DIR}/src
       - ../dds:${AMENT_WORKSPACE_DIR}/dds
       # Required for ROS 2 shared memory communication

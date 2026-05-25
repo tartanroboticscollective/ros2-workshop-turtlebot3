@@ -41,7 +41,7 @@ ENV DEBIAN_FRONTEND=dialog
 #####################
 FROM base AS dev
 
-ARG AMENT_WORKSPACE_DIR="/ament_ws"
+ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
 ARG USERNAME="developer"
 ARG UID=1000
 ARG GID=1000
@@ -114,7 +114,6 @@ ENV DEBIAN_FRONTEND=dialog
 RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /home/${USERNAME}/.bash_aliases \
  && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> /home/${USERNAME}/.bash_aliases \
  && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> /home/${USERNAME}/.bash_aliases \
- && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/${USERNAME}/.bashrc
 
 USER ${USERNAME}
 
