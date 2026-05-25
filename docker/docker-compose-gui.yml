@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   ros2_jazzy_turblebot3:
     extends:

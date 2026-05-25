@@ -1,31 +1,30 @@
 services:
   ros2_jazzy_turblebot3:
+    container_name: ros2_jazzy_turblebot3
     build:
       context: ..
-      dockerfile: docker/Dockerfile
-      target: dev
+      dockerfile: docker/Dockerfile.amd
       args:
         - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
         - USERNAME=${USERNAME:-developer}
         - UID=${UID}
         - GID=${GID}
-    container_name: ros2_jazzy_turblebot3
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-      # Limit ROS communication to local computer only
-      #- ROS_LOCALHOST_ONLY=1
       - YOUR_IP=${YOUR_IP}
       - ROBOT_IP=${ROBOT_IP}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - TURTLEBOT3_MODEL=burger
-      # Configure Cyclone with a custom configuration using the IPs above
-      #- CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
+      - GZ_IP=${YOUR_IP}
+      - AMD_VISIBLE_DEVICES=all
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
     extra_hosts:
       - "${ROBOT_HOSTNAME}:${ROBOT_IP}"
     # Required for communicating over the network
     network_mode: "host"
-    # Required for accessing hardware
-    #privileged: true
+    runtime: amd
+    privileged: true
     tty: true
     volumes:
       # Required for accessing hardware
@@ -36,4 +35,6 @@ services:
       - ../dds:${AMENT_WORKSPACE_DIR}/dds
       # Required for ROS 2 shared memory communication
       #- /dev/shm:/dev/shm
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
 

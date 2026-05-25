@@ -33,11 +33,3 @@ and then connect to the running Docker
 $ cd ros2/
 $ docker exec -it ros2_docker bash
 ```
-
-### VSCode devcontainer
-
-Open this directory as the root folder in a VScode window.
-
-- Install the [Dev Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
-
-- VScode should notify you can open the current directory in a container, if not press `F1` and type `Reopen in container` 
