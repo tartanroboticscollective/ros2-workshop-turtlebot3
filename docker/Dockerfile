@@ -28,13 +28,16 @@ RUN apt-get update \
     ros-${ROS_DISTRO}-image-transport \
     ros-${ROS_DISTRO}-point-cloud-transport \
     ros-${ROS_DISTRO}-point-cloud-transport-plugins \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    # Install Zenoh ROS2 RMW
+    ros-"$ROS_DISTRO"-rmw-zenoh-cpp \
  && rm -rf /var/lib/apt/lists/*
 
 # Add additional installation instructions here...
 
 ENV DEBIAN_FRONTEND=dialog
 
+# Setup Zenoh ROS2 RMW
+ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
 
 #####################
 # Development image #

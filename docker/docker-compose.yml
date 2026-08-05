@@ -16,10 +16,7 @@ services:
       #- ROS_LOCALHOST_ONLY=1
       - YOUR_IP=${YOUR_IP}
       - ROBOT_IP=${ROBOT_IP}
-      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - TURTLEBOT3_MODEL=burger
-      # Configure Cyclone with a custom configuration using the IPs above
-      #- CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
     extra_hosts:
       - "${ROBOT_HOSTNAME}:${ROBOT_IP}"
     # Required for communicating over the network
@@ -33,7 +30,6 @@ services:
       # Required for accessing storage media
       #- /media:/media
       - ../src:${AMENT_WORKSPACE_DIR}/src
-      - ../dds:${AMENT_WORKSPACE_DIR}/dds
       # Required for ROS 2 shared memory communication
       #- /dev/shm:/dev/shm
 
