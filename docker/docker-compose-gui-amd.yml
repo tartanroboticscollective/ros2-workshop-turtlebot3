@@ -1,6 +1,6 @@
 services:
-  ros2_jazzy_turblebot3:
-    container_name: ros2_jazzy_turblebot3
+  ros2-workshop-turtlebot3:
+    container_name: ros2-workshop-turtlebot3
     build:
       context: ..
       dockerfile: docker/Dockerfile.amd

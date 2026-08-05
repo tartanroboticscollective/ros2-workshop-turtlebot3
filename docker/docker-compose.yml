@@ -1,5 +1,5 @@
 services:
-  ros2_jazzy_turblebot3:
+  ros2-workshop-turtlebot3:
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -9,7 +9,7 @@ services:
         - USERNAME=${USERNAME:-developer}
         - UID=${UID}
         - GID=${GID}
-    container_name: ros2_jazzy_turblebot3
+    container_name: ros2-workshop-turtlebot3
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       # Limit ROS communication to local computer only
