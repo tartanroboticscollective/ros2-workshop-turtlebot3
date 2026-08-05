@@ -1,6 +1,6 @@
 services:
-  ros2_jazzy_turblebot3:
-    container_name: ros2_jazzy_turblebot3
+  ros2-workshop-turtlebot3:
+    container_name: ros2-workshop-turtlebot3
     build:
       context: ..
       dockerfile: docker/Dockerfile.amd
@@ -13,7 +13,6 @@ services:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - YOUR_IP=${YOUR_IP}
       - ROBOT_IP=${ROBOT_IP}
-      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - TURTLEBOT3_MODEL=burger
       - GZ_IP=${YOUR_IP}
       - AMD_VISIBLE_DEVICES=all
@@ -32,7 +31,6 @@ services:
       # Required for accessing storage media
       #- /media:/media
       - ../src:${AMENT_WORKSPACE_DIR}/src
-      - ../dds:${AMENT_WORKSPACE_DIR}/dds
       # Required for ROS 2 shared memory communication
       #- /dev/shm:/dev/shm
       - /tmp/.X11-unix:/tmp/.X11-unix:rw

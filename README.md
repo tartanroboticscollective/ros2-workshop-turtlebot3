@@ -23,13 +23,13 @@ $ xhost +
 Either **run the Docker** manually with
 
 ```bash
-$ cd ros2/
+$ cd ros2-workshop-turtlebot3/
 $ docker compose -f docker/docker-compose-gui.yml up
 ```
 
 and then connect to the running Docker
 
 ```bash
-$ cd ros2/
+$ cd ros2-workshop-turtlebot3/
 $ docker exec -it ros2_docker bash
 ```

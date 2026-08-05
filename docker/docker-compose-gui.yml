@@ -1,8 +1,8 @@
 services:
-  ros2_jazzy_turblebot3:
+  ros2-workshop-turtlebot3:
     extends:
       file: docker-compose.yml
-      service: ros2_jazzy_turblebot3
+      service: ros2-workshop-turtlebot3
     environment:
      - DISPLAY=${DISPLAY}
      - QT_X11_NO_MITSHM=1
