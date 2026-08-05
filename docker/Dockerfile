@@ -3,56 +3,22 @@
 ##############
 FROM osrf/ros:jazzy-desktop-full AS base
 
-ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
-
-LABEL org.opencontainers.image.authors="tobit.flatscher@outlook.com"
-LABEL description="ROS 2 Jazzy Docker template"
+LABEL description="ROS 2 Turtlebot 3 Jazzy docker image"
 LABEL version="1.0"
 
-WORKDIR ${AMENT_WORKSPACE_DIR}
-SHELL ["/bin/bash", "-c"]
-
-ENV DEBIAN_FRONTEND=noninteractive
+ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
+WORKDIR $AMENT_WORKSPACE_DIR
 
 RUN apt-get update \
- && apt-get -y install \
+    && DEBIAN_FRONTEND=noninteractive \
+        apt-get -y --quiet --no-install-recommends install \
+    # Core dependencies
     git \
     python3-colcon-clean \
+    python3-colcon-common-extensions \
     python3-osrf-pycommon \
- && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update \
- && apt-get -y install \
-    ros-${ROS_DISTRO}-compressed-image-transport \
-    ros-${ROS_DISTRO}-compressed-depth-image-transport \
-    ros-${ROS_DISTRO}-image-transport \
-    ros-${ROS_DISTRO}-point-cloud-transport \
-    ros-${ROS_DISTRO}-point-cloud-transport-plugins \
-    # Install Zenoh ROS2 RMW
-    ros-"$ROS_DISTRO"-rmw-zenoh-cpp \
- && rm -rf /var/lib/apt/lists/*
-
-# Add additional installation instructions here...
-
-ENV DEBIAN_FRONTEND=dialog
-
-# Setup Zenoh ROS2 RMW
-ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
-
-#####################
-# Development image #
-#####################
-FROM base AS dev
-
-ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
-ARG USERNAME="developer"
-ARG UID=1000
-ARG GID=1000
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update \
- && apt-get install -y \
+    python3-vcstool \
+    # Dev tools
     ack \
     bmon \
     cloc \
@@ -65,47 +31,51 @@ RUN apt-get update \
     psmisc \
     tmux \
     xterm \
+    # ROS dependencies
+    ros-"$ROS_DISTRO"-compressed-image-transport \
+    ros-"$ROS_DISTRO"-compressed-depth-image-transport \
+    ros-"$ROS_DISTRO"-image-transport \
+    ros-"$ROS_DISTRO"-point-cloud-transport \
+    ros-"$ROS_DISTRO"-point-cloud-transport-plugins \
+    ros-"$ROS_DISTRO"-rmw-zenoh-cpp \
+    # ROS tools
+    ros-"$ROS_DISTRO"-rqt-common-plugins \
+    ros-"$ROS_DISTRO"-rqt-robot-steering \
+    ros-"$ROS_DISTRO"-rqt-tf-tree \
+    ros-"$ROS_DISTRO"-rviz2 \
+    ros-"$ROS_DISTRO"-foxglove-bridge \
+    # Turtlebot 3 pc setup
+    ros-"$ROS_DISTRO"-cartographer \
+    ros-"$ROS_DISTRO"-cartographer-ros \
+    ros-"$ROS_DISTRO"-navigation2 \
+    ros-"$ROS_DISTRO"-nav2-bringup \
  && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
- && apt-get install -y \
-    python3-vcstool \
-    ros-${ROS_DISTRO}-rqt-common-plugins \
-    ros-${ROS_DISTRO}-rqt-robot-steering \
-    ros-${ROS_DISTRO}-rqt-tf-tree \
-    ros-${ROS_DISTRO}-rviz2 \
- && rm -rf /var/lib/apt/lists/*
+# Setup Zenoh ROS2 RMW
+ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
 
-# Install additional developer tools here...
+# Enable ROS log colorised output
+ENV RCUTILS_COLORIZED_OUTPUT=1
 
-RUN apt-get update \
- && apt-get install -y sudo \
- && rm -rf /var/lib/apt/lists/* \
- && userdel -r ubuntu || true \
- && addgroup --gid ${GID} ${USERNAME} \
- && adduser --disabled-password --gecos '' --uid ${GID} --gid ${GID} ${USERNAME} \
- && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
- && chown -R ${UID}:${GID} /home/${USERNAME} \
- && chown -R ${UID}:${GID} ${AMENT_WORKSPACE_DIR}
+# -----------------------------------------------------------------------
 
+#####################
+# Development layer #
+#####################
+FROM base AS dev
 
-# Turtlebot 3 pc setup
+# Clone turtlebot3 repo dependencies not available through apt
+COPY ./src/.repos $AMENT_WORKSPACE_DIR/src/.repos
+RUN vcs import --input src/.repos src
 
-RUN apt-get update \
- && apt-get install -y \
-    python3-colcon-common-extensions \
-    ros-${ROS_DISTRO}-cartographer \
-    ros-${ROS_DISTRO}-cartographer-ros \
-    ros-${ROS_DISTRO}-navigation2 \
-    ros-${ROS_DISTRO}-nav2-bringup 
+# # Source ROS setup for dependencies and build our code
+RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
+    && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /root/.bashrc \
+ && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> /root/.bashrc \
+ && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> /root/.bashrc \
+ && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc
 
-ENV DEBIAN_FRONTEND=dialog
-
-RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /home/${USERNAME}/.bash_aliases \
- && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> /home/${USERNAME}/.bash_aliases \
- && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> /home/${USERNAME}/.bash_aliases \
- && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/${USERNAME}/.bashrc
-
-USER ${USERNAME}
-
+# Don't run any ROS commands by default
+CMD ["bash"]
