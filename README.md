@@ -6,7 +6,7 @@ This dev environment uses [`vcstool`](http://wiki.ros.org/vcstool) to pull the d
 
 ```
 $ cd src/
-$ vcs import < .repos   
+$ vcs import < .repos
 ```
 
 

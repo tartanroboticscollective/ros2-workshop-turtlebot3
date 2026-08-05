@@ -95,7 +95,7 @@ RUN apt-get update \
     ros-${ROS_DISTRO}-cartographer \
     ros-${ROS_DISTRO}-cartographer-ros \
     ros-${ROS_DISTRO}-navigation2 \
-    ros-${ROS_DISTRO}-nav2-bringup 
+    ros-${ROS_DISTRO}-nav2-bringup
 
 
 ENV DEBIAN_FRONTEND=dialog
@@ -106,4 +106,3 @@ RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /
  && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/${USERNAME}/.bashrc
 
 USER ${USERNAME}
-
