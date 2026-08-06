@@ -3,7 +3,7 @@ services:
     container_name: ros2-workshop-turtlebot3
     build:
       context: ..
-      dockerfile: docker/Dockerfile.amd
+      dockerfile: docker/Dockerfile
       args:
         - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
         - USERNAME=${USERNAME:-developer}

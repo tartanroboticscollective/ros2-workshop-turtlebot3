@@ -14,6 +14,7 @@ RUN apt-get update \
         apt-get -y --quiet --no-install-recommends install \
     # Core dependencies
     git \
+    mesa-utils \
     python3-colcon-clean \
     python3-colcon-common-extensions \
     python3-osrf-pycommon \
