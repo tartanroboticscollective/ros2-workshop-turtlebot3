@@ -80,3 +80,12 @@ RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /
 
 # Don't run any ROS commands by default
 CMD ["bash"]
+
+# -----------------------------------------------------------------------
+
+#####################
+# Runtime layer #
+#####################
+FROM dev AS runtime
+
+CMD ["bash"]
