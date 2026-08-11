@@ -46,8 +46,8 @@ case "${1:-}" in
         ;;
 
     zenoh)
-        echo "Running dev.sh..."
-        ./dev.sh
+        echo "Running run.sh..."
+        ./run.sh
         ;;
 
     teleop)
