@@ -18,7 +18,7 @@ wait_for_container() {
             --filter "name=^${CONTAINER_NAME}$" \
             --filter "status=running" \
             --format '{{.Names}}' |
-            grep -qx "$CONTAINER_NAME"
+        grep -qx "$CONTAINER_NAME"
         then
             echo "Container '$CONTAINER_NAME' is running."
             return 0
