@@ -1,5 +1,7 @@
 # ROS 2 Jazzy Turtlebot3 Development
-ROS2 Jazzy turtlebot3 dev container adapted from [docker-for-robotics](https://github.com/2b-t/docker-for-robotics) by [Tobit Flatscher](https://github.com/2b-t)
+![License](https://img.shields.io/github/license/assistive-autonomy/ros2-workshop-turtlebot3)
+![ROS2 Version](https://img.shields.io/badge/ROS2-Jazzy%20Jalisco-brightgreen)
+![Issues](https://img.shields.io/github/issues/assistive-autonomy/ros2-workshop-turtlebot3)
 
 ## 0. Set-up
 This dev environment uses [`vcstool`](http://wiki.ros.org/vcstool) to pull the dependencies repos. Please import them with the following command before building the docker:
@@ -14,22 +16,31 @@ $ vcs import < .repos
 
 ### CLI
 
+To run the tmux script:
+
+```bash
+$ ./start_sesh.sh
+```
+
+**OR**, to build and run the docker container manually, first:
+
+```bash
+$ ./dev.sh
+```
+
+Which will build and run zenoh in the container.
+
+Then, to connect to the running Docker container:
+
+```bash
+$ docker exec -it ros2-workshop-turtlebot3 bash
+```
+
+
+## 2. FAQ
+
 In order to be able to run **graphical user interfaces** from inside the Docker you might have to type
 
 ```bash
 $ xhost +
-```
-
-Either **run the Docker** manually with
-
-```bash
-$ cd ros2-workshop-turtlebot3/
-$ docker compose -f docker/docker-compose-gui.yml up
-```
-
-and then connect to the running Docker
-
-```bash
-$ cd ros2-workshop-turtlebot3/
-$ docker exec -it ros2_docker bash
 ```
