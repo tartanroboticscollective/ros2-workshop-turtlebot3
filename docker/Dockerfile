@@ -1,7 +1,7 @@
 ##############
 # Base image #
 ##############
-FROM osrf/ros:jazzy-desktop-full AS base
+FROM ros:jazzy AS base
 
 LABEL description="ROS 2 Turtlebot 3 Jazzy docker image"
 LABEL version="1.0"
@@ -33,6 +33,7 @@ RUN apt-get update \
     tmux \
     xterm \
     # ROS dependencies
+    ros-"$ROS_DISTRO"-desktop-full \
     ros-"$ROS_DISTRO"-compressed-image-transport \
     ros-"$ROS_DISTRO"-compressed-depth-image-transport \
     ros-"$ROS_DISTRO"-image-transport \
