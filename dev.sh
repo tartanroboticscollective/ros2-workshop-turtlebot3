@@ -3,7 +3,7 @@
 # Build docker dev stage and add local code for live development
 # ----------------------------------------------------------------
 
-BASH_CMD=""
+BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger
 
 # Function to print usage
@@ -54,5 +54,6 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v src:/turtlebot_ws/src \
+    -v ./config:/turtlebot_ws/config \
+    -v ./src:/turtlebot_ws/src \
     ros2-workshop-turtlebot3:latest-dev $BASH_CMD

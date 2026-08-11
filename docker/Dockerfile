@@ -73,6 +73,9 @@ RUN vcs import --input src/.repos src
 RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
     && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
+# Copy pre-configured rviz layout configuration
+COPY ./config/default.rviz /root/.rviz2/default.rviz
+
 RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /root/.bashrc \
  && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> /root/.bashrc \
  && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> /root/.bashrc \
