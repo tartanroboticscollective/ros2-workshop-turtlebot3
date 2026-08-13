@@ -1,0 +1,99 @@
+{
+  "configById": {
+    "3D!workshop": {
+      "cameraState": {
+        "distance": 11,
+        "perspective": true,
+        "phi": 55,
+        "thetaOffset": 45,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.01,
+        "far": 5000
+      },
+      "followMode": "follow-none",
+      "followTf": "world",
+      "scene": {
+        "backgroundColor": "#1a1a1a",
+        "transforms": {
+          "showLabel": false,
+          "axisScale": 0.3,
+          "lineWidth": 0,
+          "lineColor": "#00000000"
+        }
+      },
+      "transforms": {},
+      "topics": {
+        "/world_markers": {
+          "visible": true
+        },
+        "/scan": {
+          "visible": true,
+          "pointSize": 5
+        },
+        "/odom": {
+          "visible": false
+        }
+      },
+      "layers": {
+        "grid": {
+          "layerId": "foxglove.Grid",
+          "label": "Grid",
+          "instanceId": "grid",
+          "visible": true,
+          "frameId": "world",
+          "size": 12,
+          "divisions": 12,
+          "color": "#3a3a3a",
+          "order": 1
+        },
+        "robot": {
+          "layerId": "foxglove.Urdf",
+          "label": "Robot",
+          "instanceId": "robot",
+          "visible": true,
+          "sourceType": "topic",
+          "topic": "/robot_description",
+          "framePrefix": "",
+          "order": 2
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose"
+      },
+      "imageMode": {}
+    },
+    "RawMessages!topics": {
+      "topicPath": "/odom.pose.pose.position"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "direction": "row",
+    "first": "3D!workshop",
+    "second": "RawMessages!topics",
+    "splitPercentage": 75
+  }
+}

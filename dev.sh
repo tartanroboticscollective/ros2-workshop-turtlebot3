@@ -1,31 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ----------------------------------------------------------------
-# Build docker dev stage and add local code for live development
+# Build the workshop image from this repository.
 # ----------------------------------------------------------------
 
-BASH_CMD=""
-TURTLEBOT3_MODEL=burger
+IMAGE="ros2-workshop-turtlebot3:local"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Function to print usage
 usage() {
     echo "
-Usage: dev.sh [-b|bash] [-h|--help]
+Usage: dev.sh [-h|--help]
+
+Builds the workshop image and tags it $IMAGE.
+Launch it with './start_sesh.sh --build'.
 
 Where:
-    -b | bash       Open bash in docker container (Default in dev.sh)
     -h | --help     Show this help message
     "
-    exit 1
+    exit "${1:-1}"
 }
 
-# Parse command-line options
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -b|bash)
-            BASH_CMD=bash
-            ;;
         -h|--help)
-            usage
+            usage 0
             ;;
         *)
             echo "Unknown option: $1"
@@ -35,25 +32,21 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Build docker image up to dev stage
+echo "Building $IMAGE..."
+
 DOCKER_BUILDKIT=1 docker build \
-    -t ros2-workshop-turtlebot3:latest-dev \
-    -f docker/Dockerfile --target dev .
+    -t "$IMAGE" \
+    -f "$REPO_DIR/docker/Dockerfile" \
+    --target dev \
+    "$REPO_DIR" || exit 1
 
-# GUI setup
-xhost + >/dev/null
+echo "Built $IMAGE."
 
-# Run docker image with local code volumes for development
-docker run -it --rm --net host --privileged \
-    --name ros2-workshop-turtlebot3 \
-    -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
-    -e QT_X11_NO_MITSHM=1 \
-    -e XAUTHORITY="${XAUTHORITY}" \
-    -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
-    -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
-    -v /dev:/dev \
-    -v /tmp:/tmp \
-    -v /etc/localtime:/etc/localtime:ro \
-    -v ./config:/turtlebot_ws/config \
-    -v ./src:/turtlebot_ws/src \
-    ros2-workshop-turtlebot3:latest-dev $BASH_CMD
+# start_sesh.sh continues straight into launching the session.
+if [[ -z "${LAUNCHING_SESSION:-}" ]]; then
+    echo "
+Start the workshop session with:
+
+    ./start_sesh.sh --build
+"
+fi
