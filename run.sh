@@ -39,7 +39,7 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run -it --rm --net host --privileged \
+podman run -it --rm --net host --privileged \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \

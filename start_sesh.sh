@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SESSION_NAME="ros2-workshop"
-CONTAINER_NAME="ros2-workshop-turtlebot3"
+CONTAINER_NAME=ros2-workshop-turtlebot3
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
@@ -14,7 +14,7 @@ wait_for_container() {
     echo "Waiting for container '$CONTAINER_NAME' to be running..."
 
     while true; do
-        if docker ps \
+        if podman ps \
             --filter "name=^${CONTAINER_NAME}$" \
             --filter "status=running" \
             --format '{{.Names}}' |
@@ -29,7 +29,7 @@ wait_for_container() {
 }
 
 exec_in_container() {
-    docker exec -it "$CONTAINER_NAME" bash -ic "$1"
+    podman exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
 
@@ -42,7 +42,7 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec podman exec -it "$CONTAINER_NAME" /bin/bash
         ;;
 
     zenoh)
