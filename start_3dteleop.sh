@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+cd /disk/scratch/$USER/ros2-workshop-turtlebot3/
 SESSION_NAME="ros2-workshop"
 CONTAINER_NAME="ros2-workshop-turtlebot3"
 
@@ -7,14 +8,14 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SO
 
 
 # ================================================================
-# Docker helpers
+# podman helpers
 # ================================================================
 
 wait_for_container() {
     echo "Waiting for container '$CONTAINER_NAME' to be running..."
 
     while true; do
-        if docker ps \
+        if podman ps --root /disk/scratch/$USER/root \
             --filter "name=^${CONTAINER_NAME}$" \
             --filter "status=running" \
             --format '{{.Names}}' |
@@ -29,7 +30,7 @@ wait_for_container() {
 }
 
 exec_in_container() {
-    docker exec -it "$CONTAINER_NAME" bash -ic "$1"
+    podman exec -it --root /disk/scratch/$USER/root "$CONTAINER_NAME" bash -ic "$1"
 }
 
 
@@ -42,7 +43,7 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec podman exec -it --root /disk/scratch/$USER/root "$CONTAINER_NAME" /bin/bash
         ;;
 
     zenoh)
@@ -102,18 +103,18 @@ tmux new-session -d -s "$SESSION_NAME"
 MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
 
 ZENOH_PANE=$(tmux split-window \
-    -v -t "$MAIN_PANE" -l 30 -P -F '#{pane_id}')
+    -v -t "$MAIN_PANE" -l '30%' -P -F '#{pane_id}')
 
 # Main / Teleop
 TELEOP_PANE=$(tmux split-window \
-    -h -t "$MAIN_PANE" -l 33 -P -F '#{pane_id}')
+    -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
 # Zenoh / RViz2 / Gazebo
 RVIZ_PANE=$(tmux split-window \
-    -h -t "$ZENOH_PANE" -l 66 -P -F '#{pane_id}')
+    -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
 GAZEBO_PANE=$(tmux split-window \
-    -h -t "$RVIZ_PANE" -l 50 -P -F '#{pane_id}')
+    -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 
 # ================================================================
