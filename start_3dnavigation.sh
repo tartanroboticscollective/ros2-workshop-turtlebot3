@@ -50,10 +50,10 @@ case "${1:-}" in
         ./run.sh
         ;;
 
-    teleop)
+    navigation)
         wait_for_container
-        echo "Starting TurtleBot3 teleop..."
-        exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard"
+        echo "Starting TurtleBot3 navigation..."
+        exec_in_container "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=/turtlebot_ws/maps/backup.yaml use_sim_time:=True"
         ;;
 
     gazebo)
@@ -85,7 +85,7 @@ esac
 #
 # ┌──────────────────────────────────┬─────────────────┐
 # │                                  │                 │
-# │          Main terminal           │     Teleop      │
+# │          Main terminal           │   Navigation    │
 # │                                  │                 │
 # ├──────────────────┬───────────────┼─────────────────┤
 # │      Zenoh       │     RViz2     │     Gazebo      │
@@ -102,18 +102,18 @@ tmux new-session -d -s "$SESSION_NAME"
 MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
 
 ZENOH_PANE=$(tmux split-window \
-    -v -t "$MAIN_PANE" -l 30 -P -F '#{pane_id}')
+    -v -t "$MAIN_PANE" -l '30%' -P -F '#{pane_id}')
 
 # Main / Teleop
-TELEOP_PANE=$(tmux split-window \
-    -h -t "$MAIN_PANE" -l 33 -P -F '#{pane_id}')
+NAVIGATION_PANE=$(tmux split-window \
+    -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
 # Zenoh / RViz2 / Gazebo
 RVIZ_PANE=$(tmux split-window \
-    -h -t "$ZENOH_PANE" -l 66 -P -F '#{pane_id}')
+    -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
 GAZEBO_PANE=$(tmux split-window \
-    -h -t "$RVIZ_PANE" -l 50 -P -F '#{pane_id}')
+    -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 
 # ================================================================
@@ -123,8 +123,8 @@ GAZEBO_PANE=$(tmux split-window \
 tmux send-keys -t "$MAIN_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
-tmux send-keys -t "$TELEOP_PANE" \
-    "bash '$SCRIPT_PATH' teleop" C-m
+tmux send-keys -t "$NAVIGATION_PANE" \
+    "bash '$SCRIPT_PATH' navigation" C-m
 
 tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' zenoh" C-m
@@ -137,6 +137,6 @@ tmux send-keys -t "$GAZEBO_PANE" \
 
 
 # Start with keyboard focus on Teleop.
-tmux select-pane -t "$TELEOP_PANE"
+tmux select-pane -t "$NAVIGATION_PANE"
 
 exec tmux attach-session -t "$SESSION_NAME"
