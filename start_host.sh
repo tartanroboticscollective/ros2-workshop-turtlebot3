@@ -102,18 +102,18 @@ tmux new-session -d -s "$SESSION_NAME"
 MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
 
 ZENOH_PANE=$(tmux split-window \
-    -v -t "$MAIN_PANE" -p 30 -P -F '#{pane_id}')
+    -v -t "$MAIN_PANE" -l 30 -P -F '#{pane_id}')
 
 # Main / Teleop
 TELEOP_PANE=$(tmux split-window \
-    -h -t "$MAIN_PANE" -p 33 -P -F '#{pane_id}')
+    -h -t "$MAIN_PANE" -l 33 -P -F '#{pane_id}')
 
 # Zenoh / rqt_graph / TurtleSim
 RQT_PANE=$(tmux split-window \
-    -h -t "$ZENOH_PANE" -p 66 -P -F '#{pane_id}')
+    -h -t "$ZENOH_PANE" -l 66 -P -F '#{pane_id}')
 
 TURTLESIM_PANE=$(tmux split-window \
-    -h -t "$RQT_PANE" -p 50 -P -F '#{pane_id}')
+    -h -t "$RQT_PANE" -l 50 -P -F '#{pane_id}')
 
 
 # ================================================================
