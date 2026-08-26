@@ -115,7 +115,7 @@ TELEOP_PANE=$(tmux split-window \
 
 # Zenoh / rqt_graph / TurtleSim
 # RQT_PANE=$(tmux split-window \
-#     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
+    #     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
 TURTLE_SPAWN_PANE=$(tmux split-window \
     -h -t "$ZENOH_PANE" -l '50%' -P -F '#{pane_id}')
@@ -135,7 +135,7 @@ tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' zenoh" C-m
 
 # tmux send-keys -t "$RQT_PANE" \
-#     "bash '$SCRIPT_PATH' rqt_graph" C-m
+    #     "bash '$SCRIPT_PATH' rqt_graph" C-m
 
 tmux send-keys -t "$TURTLE_SPAWN_PANE" \
     "bash '$SCRIPT_PATH' turtle_spawn $TURTLE_NAME" C-m
