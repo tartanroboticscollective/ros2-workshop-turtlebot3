@@ -6,6 +6,9 @@
 BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger
 
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
+
 # Function to print usage
 usage() {
     echo "
@@ -49,7 +52,7 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v ../config/default.rviz:/root/.rviz2/default.rviz \
-    -v ../maps:/turtlebot_ws/maps \
-    -v ../src:/turtlebot_ws/src \
+    -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
+    -v $WS_PATH/maps:/turtlebot_ws/maps \
+    -v $WS_PATH/src:/turtlebot_ws/src \
     ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD

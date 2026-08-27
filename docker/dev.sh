@@ -6,6 +6,9 @@
 BASH_CMD=""
 TURTLEBOT3_MODEL=burger
 
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
+
 # Function to print usage
 usage() {
     echo "
@@ -38,7 +41,7 @@ done
 # Build docker image up to dev stage
 DOCKER_BUILDKIT=1 docker build \
     -t ros2-workshop-turtlebot3:latest-dev \
-    -f Dockerfile --target dev .
+    -f $WS_PATH/docker/Dockerfile --target dev .
 
 # GUI setup
 xhost + >/dev/null
@@ -54,6 +57,7 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v ./config:/turtlebot_ws/config \
-    -v ./src:/turtlebot_ws/src \
+    -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
+    -v $WS_PATH/maps:/turtlebot_ws/maps \
+    -v $WS_PATH/src:/turtlebot_ws/src \
     ros2-workshop-turtlebot3:latest-dev $BASH_CMD
