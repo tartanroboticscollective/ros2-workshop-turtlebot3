@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
-SESSION_NAME="ros2-join"
+SESSION_NAME="ros2-workshop"
 CONTAINER_NAME="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
 
-TURTLE_NAME="turtle_$((1 + $RANDOM % 100000))"
-RANDOM_X=$((1 + $RANDOM % 10))
-RANDOM_Y=$((1 + $RANDOM % 10))
-RANDOM_T=$(bc <<<"scale=2; $((1 + $RANDOM % 314)) / 100")
 
 # ================================================================
 # Docker helpers
@@ -51,26 +48,25 @@ case "${1:-}" in
 
     zenoh)
         echo "Running run.sh..."
-        ./run.sh
+        $WS_PATH/docker/run.sh
         ;;
 
     teleop)
         wait_for_container
-        echo "Starting Turtle teleop..."
-        echo $2
-        exec_in_container "ros2 run turtlesim turtle_teleop_key --ros-args --remap __node:=$2 --remap turtle1/cmd_vel:=$2/cmd_vel"
+        echo "Starting TurtleBot3 teleop..."
+        exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard"
         ;;
 
-    turtle_spawn)
+    gazebo)
         wait_for_container
-        echo "Spawning new turtle..."
-        exec_in_container "ros2 service call /spawn turtlesim/srv/Spawn \"{x: $RANDOM_X, y: $RANDOM_Y, theta: $RANDOM_T, name: '$2'}\""
+        echo "Starting TurtleBot3 Gazebo..."
+        exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         ;;
 
-    rqt_graph)
+    cartographer)
         wait_for_container
-        echo "Starting rqt_graph..."
-        exec_in_container "rqt_graph"
+        echo "Starting Cartographer..."
+        exec_in_container "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True"
         ;;
 
     "")
@@ -93,7 +89,7 @@ esac
 # │          Main terminal           │     Teleop      │
 # │                                  │                 │
 # ├──────────────────┬───────────────┼─────────────────┤
-# │      Zenoh       │   rqt_graph   │    TurtleSim    │
+# │      Zenoh       │ Cartographer  │     Gazebo      │
 # └──────────────────┴───────────────┴─────────────────┘
 # ================================================================
 
@@ -113,12 +109,12 @@ ZENOH_PANE=$(tmux split-window \
 TELEOP_PANE=$(tmux split-window \
     -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
-# Zenoh / rqt_graph / TurtleSim
-# RQT_PANE=$(tmux split-window \
-    #     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
+# Zenoh / Cartographer / Gazebo
+CARTOGRAPHER_PANE=$(tmux split-window \
+    -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
-TURTLE_SPAWN_PANE=$(tmux split-window \
-    -h -t "$ZENOH_PANE" -l '50%' -P -F '#{pane_id}')
+GAZEBO_PANE=$(tmux split-window \
+    -h -t "$CARTOGRAPHER_PANE" -l '50%' -P -F '#{pane_id}')
 
 
 # ================================================================
@@ -126,19 +122,20 @@ TURTLE_SPAWN_PANE=$(tmux split-window \
 # ================================================================
 
 tmux send-keys -t "$MAIN_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m
+    "bash '$SCRIPT_PATH' terminal" C-m \
+    "ros2 run nav2_map_server map_saver_cli -f /turtlebot_ws/maps/map"
 
 tmux send-keys -t "$TELEOP_PANE" \
-    "bash '$SCRIPT_PATH' teleop $TURTLE_NAME" C-m
+    "bash '$SCRIPT_PATH' teleop" C-m
 
 tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' zenoh" C-m
 
-# tmux send-keys -t "$RQT_PANE" \
-    #     "bash '$SCRIPT_PATH' rqt_graph" C-m
+tmux send-keys -t "$CARTOGRAPHER_PANE" \
+    "bash '$SCRIPT_PATH' cartographer" C-m
 
-tmux send-keys -t "$TURTLE_SPAWN_PANE" \
-    "bash '$SCRIPT_PATH' turtle_spawn $TURTLE_NAME" C-m
+tmux send-keys -t "$GAZEBO_PANE" \
+    "bash '$SCRIPT_PATH' gazebo" C-m
 
 
 # Start with keyboard focus on Teleop.

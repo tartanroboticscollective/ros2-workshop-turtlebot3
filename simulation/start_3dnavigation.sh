@@ -4,6 +4,7 @@ SESSION_NAME="ros2-workshop"
 CONTAINER_NAME="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
 
 
 # ================================================================
@@ -47,25 +48,19 @@ case "${1:-}" in
 
     zenoh)
         echo "Running run.sh..."
-        ./run.sh
+        $WS_PATH/docker/run.sh
         ;;
 
-    teleop)
+    navigation)
         wait_for_container
-        echo "Starting Turtle teleop..."
-        exec_in_container "ros2 run turtlesim turtle_teleop_key"
+        echo "Starting TurtleBot3 navigation..."
+        exec_in_container "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=/turtlebot_ws/maps/map.yaml use_sim_time:=True"
         ;;
 
-    turtlesim)
+    gazebo)
         wait_for_container
-        echo "Starting TurtleSim2D..."
-        exec_in_container "ros2 run turtlesim turtlesim_node"
-        ;;
-
-    rqt_graph)
-        wait_for_container
-        echo "Starting rqt_graph..."
-        exec_in_container "rqt_graph"
+        echo "Starting TurtleBot3 Gazebo..."
+        exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         ;;
 
     "")
@@ -85,10 +80,10 @@ esac
 #
 # ┌──────────────────────────────────┬─────────────────┐
 # │                                  │                 │
-# │          Main terminal           │     Teleop      │
+# │          Main terminal           │      Teleop     │
 # │                                  │                 │
 # ├──────────────────┬───────────────┼─────────────────┤
-# │      Zenoh       │   rqt_graph   │    TurtleSim    │
+# │      Zenoh       │  Navigation   │     Gazebo      │
 # └──────────────────┴───────────────┴─────────────────┘
 # ================================================================
 
@@ -108,12 +103,12 @@ ZENOH_PANE=$(tmux split-window \
 TELEOP_PANE=$(tmux split-window \
     -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
-# Zenoh / rqt_graph / TurtleSim
-RQT_PANE=$(tmux split-window \
+# Zenoh / RViz2 / Gazebo
+NAVIGATION_PANE=$(tmux split-window \
     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
-TURTLESIM_PANE=$(tmux split-window \
-    -h -t "$RQT_PANE" -l '50%' -P -F '#{pane_id}')
+GAZEBO_PANE=$(tmux split-window \
+    -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 
 # ================================================================
@@ -124,19 +119,20 @@ tmux send-keys -t "$MAIN_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
 tmux send-keys -t "$TELEOP_PANE" \
-    "bash '$SCRIPT_PATH' teleop" C-m
+    "bash '$SCRIPT_PATH' terminal" C-m \
+    "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
 
 tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' zenoh" C-m
 
-tmux send-keys -t "$RQT_PANE" \
-    "bash '$SCRIPT_PATH' rqt_graph" C-m
+tmux send-keys -t "$NAVIGATION_PANE" \
+    "bash '$SCRIPT_PATH' navigation" C-m
 
-tmux send-keys -t "$TURTLESIM_PANE" \
-    "bash '$SCRIPT_PATH' turtlesim" C-m
+tmux send-keys -t "$GAZEBO_PANE" \
+    "bash '$SCRIPT_PATH' gazebo" C-m
 
 
 # Start with keyboard focus on Teleop.
-tmux select-pane -t "$TELEOP_PANE"
+tmux select-pane -t "$NAVIGATION_PANE"
 
 exec tmux attach-session -t "$SESSION_NAME"

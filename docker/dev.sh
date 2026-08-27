@@ -38,7 +38,7 @@ done
 # Build docker image up to dev stage
 DOCKER_BUILDKIT=1 docker build \
     -t ros2-workshop-turtlebot3:latest-dev \
-    -f docker/Dockerfile --target dev .
+    -f Dockerfile --target dev .
 
 # GUI setup
 xhost + >/dev/null

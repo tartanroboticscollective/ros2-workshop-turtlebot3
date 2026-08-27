@@ -4,7 +4,7 @@ SESSION_NAME="ros2-workshop"
 CONTAINER_NAME="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-
+WS_PATH="${SCRIPT_PATH%/*/*}"
 
 # ================================================================
 # Docker helpers
@@ -47,13 +47,13 @@ case "${1:-}" in
 
     zenoh)
         echo "Running run.sh..."
-        ./run.sh
+        $WS_PATH/docker/run.sh
         ;;
 
     teleop)
         wait_for_container
         echo "Starting TurtleBot3 teleop..."
-        exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard"
+        exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
         ;;
 
     gazebo)
@@ -62,10 +62,10 @@ case "${1:-}" in
         exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         ;;
 
-    cartographer)
+    rviz)
         wait_for_container
-        echo "Starting Cartographer..."
-        exec_in_container "ros2 launch turtlebot3_cartographer cartographer.launch.py"
+        echo "Starting RViz2..."
+        exec_in_container "ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true"
         ;;
 
     "")
@@ -88,7 +88,7 @@ esac
 # │          Main terminal           │     Teleop      │
 # │                                  │                 │
 # ├──────────────────┬───────────────┼─────────────────┤
-# │      Zenoh       │ Cartographer  │     Gazebo      │
+# │      Zenoh       │     RViz2     │     Gazebo      │
 # └──────────────────┴───────────────┴─────────────────┘
 # ================================================================
 
@@ -108,12 +108,12 @@ ZENOH_PANE=$(tmux split-window \
 TELEOP_PANE=$(tmux split-window \
     -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
-# Zenoh / Cartographer / Gazebo
-CARTOGRAPHER_PANE=$(tmux split-window \
+# Zenoh / RViz2 / Gazebo
+RVIZ_PANE=$(tmux split-window \
     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
 GAZEBO_PANE=$(tmux split-window \
-    -h -t "$CARTOGRAPHER_PANE" -l '50%' -P -F '#{pane_id}')
+    -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 
 # ================================================================
@@ -123,17 +123,14 @@ GAZEBO_PANE=$(tmux split-window \
 tmux send-keys -t "$MAIN_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
-tmux send-keys -t "$MAIN_PANE" \
-    "ros2 run nav2_map_server map_saver_cli -f /turtlebot_ws/maps/map"
-
 tmux send-keys -t "$TELEOP_PANE" \
     "bash '$SCRIPT_PATH' teleop" C-m
 
 tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' zenoh" C-m
 
-tmux send-keys -t "$CARTOGRAPHER_PANE" \
-    "bash '$SCRIPT_PATH' cartographer" C-m
+tmux send-keys -t "$RVIZ_PANE" \
+    "bash '$SCRIPT_PATH' rviz" C-m
 
 tmux send-keys -t "$GAZEBO_PANE" \
     "bash '$SCRIPT_PATH' gazebo" C-m

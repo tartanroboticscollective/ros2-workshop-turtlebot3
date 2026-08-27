@@ -49,7 +49,7 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v ./config/default.rviz:/root/.rviz2/default.rviz \
-    -v ./maps:/turtlebot_ws/maps \
-    -v ./src:/turtlebot_ws/src \
+    -v ../config/default.rviz:/root/.rviz2/default.rviz \
+    -v ../maps:/turtlebot_ws/maps \
+    -v ../src:/turtlebot_ws/src \
     ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
