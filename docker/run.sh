@@ -3,16 +3,19 @@
 # Build docker dev stage and add local code for live development
 # ----------------------------------------------------------------
 
-BASH_CMD=""
+BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger
+
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
 
 # Function to print usage
 usage() {
     echo "
-Usage: dev.sh [-b|bash] [-h|--help]
+Usage: run.sh [-b|bash] [-h|--help]
 
 Where:
-    -b | bash       Open bash in docker container (Default in dev.sh)
+    -b | bash       Open bash in docker container
     -h | --help     Show this help message
     "
     exit 1
@@ -35,11 +38,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Build docker image up to dev stage
-DOCKER_BUILDKIT=1 docker build \
-    -t ros2-workshop-turtlebot3:latest-dev \
-    -f docker/Dockerfile --target dev .
-
 # GUI setup
 xhost + >/dev/null
 
@@ -54,6 +52,7 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v ./config:/turtlebot_ws/config \
-    -v ./src:/turtlebot_ws/src \
-    ros2-workshop-turtlebot3:latest-dev $BASH_CMD
+    -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
+    -v $WS_PATH/maps:/turtlebot_ws/maps \
+    -v $WS_PATH/src:/turtlebot_ws/src \
+    ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD

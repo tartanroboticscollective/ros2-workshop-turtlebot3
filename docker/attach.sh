@@ -3,7 +3,7 @@
 # Build docker dev stage and add local code for live development
 # ----------------------------------------------------------------
 
-BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
+BASH_CMD="bash"
 TURTLEBOT3_MODEL=burger
 
 # Function to print usage
@@ -39,16 +39,4 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run -it --rm --net host --privileged \
-    --name ros2-workshop-turtlebot3 \
-    -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
-    -e QT_X11_NO_MITSHM=1 \
-    -e XAUTHORITY="${XAUTHORITY}" \
-    -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
-    -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
-    -v /dev:/dev \
-    -v /tmp:/tmp \
-    -v /etc/localtime:/etc/localtime:ro \
-    -v ./config/default.rviz:/root/.rviz2/default.rviz \
-    -v ./src:/turtlebot_ws/src \
-    ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
+docker exec -it ros2-workshop-turtlebot3 $BASH_CMD
