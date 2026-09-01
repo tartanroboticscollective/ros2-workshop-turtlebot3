@@ -62,10 +62,12 @@ docker run --pull=always -it --rm --net host --privileged \
     -e XAUTHORITY="${XAUTHORITY}" \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
+    -e ZENOH_ROUTER_CONFIG_URI=/turtlebot_ws/zenoh/ROUTER_CONFIG.json5 \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
     -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
-    ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
+    -v $WS_PATH/zenoh:/turtlebot_ws/zenoh \
+    docker.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
