@@ -69,7 +69,7 @@ ENV RCUTILS_COLORIZED_OUTPUT=1
 FROM base AS dev
 
 # Clone turtlebot3 repo dependencies not available through apt
-COPY .repos $AMENT_WORKSPACE_DIR/src/.repos
+COPY docker/.repos $AMENT_WORKSPACE_DIR/src/.repos
 RUN vcs import --input src/.repos src
 
 # # Source ROS setup for dependencies and build our code

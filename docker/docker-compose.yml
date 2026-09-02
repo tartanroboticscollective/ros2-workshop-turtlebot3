@@ -19,14 +19,14 @@ services:
     # Required for accessing hardware
     #privileged: true
     tty: true
+    stdin_open: true
     volumes:
       - ../src:${AMENT_WORKSPACE_DIR}/src
       - /dev/shm:/dev/shm
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
-      - /dev:/dev \
-      - /tmp:/tmp \
-      - /etc/localtime:/etc/localtime:ro \
-      - $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
-      - $WS_PATH/maps:/turtlebot_ws/maps \
-      - $WS_PATH/src:/turtlebot_ws/src \
+      - /dev:/dev
+      - /tmp:/tmp
+      - /etc/localtime:/etc/localtime:ro
+      - ../config/default.rviz:/root/.rviz2/default.rviz
+      - ../maps:/turtlebot_ws/maps
