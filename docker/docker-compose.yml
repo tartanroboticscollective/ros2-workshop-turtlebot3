@@ -10,15 +10,8 @@ services:
         - UID=${UID}
         - GID=${GID}
     container_name: ros2-workshop-turtlebot3
-    environment:
-      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-      # Limit ROS communication to local computer only
-      #- ROS_LOCALHOST_ONLY=1
-      - YOUR_IP=${YOUR_IP}
-      - ROBOT_IP=${ROBOT_IP}
-      - TURTLEBOT3_MODEL=burger
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
+    env_file:
+      - turtlebot.env
     extra_hosts:
       - "${ROBOT_HOSTNAME}:${ROBOT_IP}"
     # Required for communicating over the network
@@ -27,13 +20,13 @@ services:
     #privileged: true
     tty: true
     volumes:
-      # Required for accessing hardware
-      #- /dev:/dev
-      # Required for accessing storage media
-      #- /media:/media
       - ../src:${AMENT_WORKSPACE_DIR}/src
-      # Required for ROS 2 shared memory communication
-      #- /dev/shm:/dev/shm
-      ## Required for GUI apps
+      - /dev/shm:/dev/shm
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - /dev:/dev \
+      - /tmp:/tmp \
+      - /etc/localtime:/etc/localtime:ro \
+      - $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
+      - $WS_PATH/maps:/turtlebot_ws/maps \
+      - $WS_PATH/src:/turtlebot_ws/src \
