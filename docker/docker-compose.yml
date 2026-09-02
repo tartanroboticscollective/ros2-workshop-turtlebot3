@@ -17,6 +17,8 @@ services:
       - YOUR_IP=${YOUR_IP}
       - ROBOT_IP=${ROBOT_IP}
       - TURTLEBOT3_MODEL=burger
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
     extra_hosts:
       - "${ROBOT_HOSTNAME}:${ROBOT_IP}"
     # Required for communicating over the network
@@ -32,3 +34,6 @@ services:
       - ../src:${AMENT_WORKSPACE_DIR}/src
       # Required for ROS 2 shared memory communication
       #- /dev/shm:/dev/shm
+      ## Required for GUI apps
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
