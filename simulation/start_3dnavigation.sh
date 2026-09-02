@@ -52,7 +52,7 @@ wait_for_container() {
     echo "Waiting for container '$CONTAINER_NAME' to be running..."
 
     while true; do
-        if docker ps \
+        if podman --root /disk/scratch/$USER/root ps \
             --filter "name=^${CONTAINER_NAME}$" \
             --filter "status=running" \
             --format '{{.Names}}' |
@@ -67,7 +67,7 @@ wait_for_container() {
 }
 
 exec_in_container() {
-    docker exec -it "$CONTAINER_NAME" bash -ic "$1"
+    podman --root /disk/scratch/$USER/root exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
 
@@ -80,7 +80,7 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec podman --root /disk/scratch/$USER/root exec -it "$CONTAINER_NAME" /bin/bash
         ;;
 
     zenoh)

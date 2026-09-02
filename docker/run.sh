@@ -55,7 +55,7 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run --pull=always -it --rm --net host --privileged \
+podman run --root /disk/scratch/$USER/root --pull=always -it --rm --net host --privileged \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \
@@ -68,4 +68,4 @@ docker run --pull=always -it --rm --net host --privileged \
     -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
-    ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
+    docker.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
