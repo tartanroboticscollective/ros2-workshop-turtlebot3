@@ -1,3 +1,4 @@
 src/*
+!src/apriltag-sim/
 maps/*
 !src/.repos
