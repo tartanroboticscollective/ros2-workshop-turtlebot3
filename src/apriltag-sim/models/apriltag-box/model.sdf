@@ -5,19 +5,27 @@
     <!-- The OBJ's Bottom face is local X=0; rotate it onto Gazebo's Z=0 plane. -->
     <pose>0 0 0 0 -1.57079632679 0</pose>
 
-    <link name="link">
+    <link name="walls_link">
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://apriltag-box/meshes/world.obj</uri>
+            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
           </mesh>
         </geometry>
       </collision>
 
-      <visual name="visual">
+      <visual name="walls">
         <geometry>
           <mesh>
-            <uri>model://apriltag-box/meshes/world.obj</uri>
+            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <visual name="tags">
+        <geometry>
+          <mesh>
+            <uri>model://apriltag-box/meshes/tags/tags.obj</uri>
           </mesh>
         </geometry>
       </visual>

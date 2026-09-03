@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <arg name="use_sim_time" default="true"/>
-  <arg name="x_pose" default="-2.0"/>
-  <arg name="y_pose" default="-0.5"/>
+  <arg name="x_pose" default="0"/>
+  <arg name="y_pose" default="0"/>
 
   <append_env name="GZ_SIM_RESOURCE_PATH"
               value="$(find-pkg-share apriltag-sim)/models"/>
