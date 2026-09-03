@@ -29,6 +29,14 @@ compose() {
         "$@"
 }
 
+usage() {
+    cat <<'EOF'
+Usage: dev_session.sh [--stop]
+
+  --stop    Stop the tmux session and run Docker Compose down.
+EOF
+}
+
 wait_for_container() {
     echo "Waiting for container '$CONTAINER_NAME' to be running..."
 
@@ -55,18 +63,27 @@ start_zenoh() {
     wait_for_container
 
     if compose exec -T "$COMPOSE_SERVICE" pgrep -x rmw_zenohd >/dev/null 2>&1; then
+        echo "Zenoh router is already running in $CONTAINER_NAME."
         return 0
     fi
 
     echo "Starting Zenoh router in $CONTAINER_NAME..."
-    compose exec -T -d "$COMPOSE_SERVICE" \
-        bash -ic "exec ros2 run rmw_zenoh_cpp rmw_zenohd" >/dev/null
+    exec_in_container "exec ros2 run rmw_zenoh_cpp rmw_zenohd"
 }
 
 start_compose() {
     echo "Starting Docker Compose service '$COMPOSE_SERVICE'..."
-    compose up --build --detach || return $?
-    start_zenoh
+    compose up --build --detach
+}
+
+stop_session() {
+    if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        echo "Stopping tmux session '$SESSION_NAME'..."
+        tmux kill-session -t "$SESSION_NAME"
+    fi
+
+    echo "Stopping Docker Compose service '$COMPOSE_SERVICE'..."
+    compose down
 }
 
 
@@ -75,6 +92,16 @@ start_compose() {
 # ================================================================
 
 case "${1:-}" in
+
+    --stop)
+        stop_session
+        exit $?
+        ;;
+
+    -h|--help)
+        usage
+        exit 0
+        ;;
 
     terminal)
         wait_for_container
@@ -157,6 +184,9 @@ ZENOH_PANE=$(tmux split-window \
 # ================================================================
 
 tmux send-keys -t "$MAIN_PANE" \
+    "bash '$SCRIPT_PATH' terminal" C-m
+
+tmux send-keys -t "$EMPTY_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
 tmux send-keys -t "$ZENOH_PANE" \

@@ -2,7 +2,7 @@ services:
   ros2-workshop-turtlebot3:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile # TODO: update this with tartan docker hub image
       target: dev
       args:
         - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
@@ -28,5 +28,5 @@ services:
       - /dev:/dev
       - /tmp:/tmp
       - /etc/localtime:/etc/localtime:ro
-      - ../config/default.rviz:/root/.rviz2/default.rviz
+      - ../config/default.rviz:/home/${USERNAME:-developer}/.rviz2/default.rviz
       - ../maps:/turtlebot_ws/maps
