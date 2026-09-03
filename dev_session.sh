@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# tiny fix amd gpu PLEASE DONT REMOVE
+#xhost +
+
+
 SESSION_NAME="ros2-workshop"
 CONTAINER_NAME="ros2-workshop-turtlebot3"
 COMPOSE_SERVICE="ros2-workshop-turtlebot3"
