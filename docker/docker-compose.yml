@@ -29,4 +29,3 @@ services:
       - /tmp:/tmp
       - /etc/localtime:/etc/localtime:ro
       - ../config/default.rviz:/home/${USERNAME:-developer}/.rviz2/default.rviz
-      - ../maps:/turtlebot_ws/maps
