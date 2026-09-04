@@ -159,8 +159,10 @@ esac
 # │                                  │                 │
 # │          Main terminal           │      Zenoh      │
 # │                                  │                 │
+# │                                  ├─────────────────┤
+# │                                  │       T2        │
 # ├──────────────────────────────────┴─────────────────┤
-# │                       Empty                        │
+# │     EMPTY                        |       T3        │
 # └────────────────────────────────────────────────────┘
 # ================================================================
 
@@ -175,12 +177,21 @@ tmux new-session -d -s "$SESSION_NAME"
 # Main / Gazebo
 MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
 
-EMPTY_PANE=$(tmux split-window \
-    -v -t "$MAIN_PANE" -l '30%' -P -F '#{pane_id}')
 
 # Main / Teleop
 ZENOH_PANE=$(tmux split-window \
-    -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
+    -h -t "$MAIN_PANE" -P -F '#{pane_id}')
+
+
+EMPTY_PANE=$(tmux split-window \
+    -v -t "$MAIN_PANE" -P -F '#{pane_id}')
+
+T_2=$(tmux split-window \
+    -v -t "$ZENOH_PANE" -P -F '#{pane_id}')
+
+T_3=$(tmux split-window \
+    -v -t "$ZENOH_PANE" -P -F '#{pane_id}')
+
 
 
 # ================================================================
@@ -190,11 +201,17 @@ ZENOH_PANE=$(tmux split-window \
 tmux send-keys -t "$MAIN_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
+tmux send-keys -t "$ZENOH_PANE" \
+    "bash '$SCRIPT_PATH' zenoh" C-m
+
 tmux send-keys -t "$EMPTY_PANE" \
     "bash '$SCRIPT_PATH' terminal" C-m
 
-tmux send-keys -t "$ZENOH_PANE" \
-    "bash '$SCRIPT_PATH' zenoh" C-m
+tmux send-keys -t "$T_2" \
+    "bash '$SCRIPT_PATH' terminal" C-m
+
+tmux send-keys -t "$T_3" \
+    "bash '$SCRIPT_PATH' terminal" C-m
 
 
 # Start with keyboard focus on Teleop.

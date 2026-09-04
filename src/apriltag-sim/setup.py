@@ -22,6 +22,7 @@ setup(
         (os.path.join('share', package_name, 'models', 'apriltag-box'), model_files),
         (os.path.join('share', package_name, 'models', 'apriltag-box', 'meshes', 'tags'),glob('models/apriltag-box/meshes/tags/*')),
         (os.path.join('share', package_name, 'models', 'apriltag-box', 'meshes', 'walls'),glob('models/apriltag-box/meshes/walls/*')),
+        (os.path.join('share', package_name, 'map'), glob('map/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

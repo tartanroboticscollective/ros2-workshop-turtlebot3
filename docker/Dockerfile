@@ -68,6 +68,8 @@ ENV RCUTILS_COLORIZED_OUTPUT=1
 #####################
 FROM base AS dev
 
+RUN apt-get update && apt-get full-upgrade -y --quiet
+
 ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
 ARG USERNAME="developer"
 ARG UID=1000

@@ -26,4 +26,9 @@
     <arg name="x_pose" value="$(var x_pose)"/>
     <arg name="y_pose" value="$(var y_pose)"/>
   </include>
+
+  <include file="$(find-pkg-share turtlebot3_navigation2)/launch/navigation2.launch.py">
+    <arg name="use_sim_time" value="$(var use_sim_time)"/>
+    <arg name="map" value="$(find-pkg-share apriltag-sim)/map/map.yaml"/>
+  </include>
 </launch>
