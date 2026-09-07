@@ -5,9 +5,9 @@
 
 BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger_cam
-
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-WS_PATH="${SCRIPT_PATH%/*/*}"
+ZENOH_ROUTER_CONFIG_URI="/turtlebot_ws/zenoh/ROUTER_CONFIG.json5"
+ZENOH_SESSION_CONFIG_URI="/turtlebot_ws/zenoh/SESSION_CONFIG.json5"
+ZENOH_CONFIG_JOIN_OVERRIDE=""
 
 # Function to print usage
 usage() {
@@ -16,6 +16,7 @@ Usage: run.sh [-b|bash] [-m|--model] turtlebot3_model [-h|--help]
 
 Where:
     -b | bash       Open bash in docker container
+    -j              Override Zenoh default config to connect to remote router
     -m | --model    Set turtlebot3 model (e.g. "burger_cam" or "waffle_pi")
     -h | --help     Show this help message
     "
@@ -27,6 +28,11 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -b|bash)
             BASH_CMD=bash
+            ;;
+        -j)
+            ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.1.100:7447"]'
+            ZENOH_ROUTER_CONFIG_URI=""
+            ZENOH_SESSION_CONFIG_URI=""
             ;;
         -m|--model)
             if [[ -n "$2" && "$2" != -* ]]; then
@@ -59,8 +65,9 @@ docker run --pull=always -it --rm --net host --privileged \
     -e XAUTHORITY="${XAUTHORITY}" \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
-    -e ZENOH_ROUTER_CONFIG_URI=/turtlebot_ws/zenoh/ROUTER_CONFIG.json5 \
-    -e ZENOH_SESSION_CONFIG_URI=/turtlebot_ws/zenoh/SESSION_CONFIG.json5 \
+    -e ZENOH_ROUTER_CONFIG_URI="$ZENOH_ROUTER_CONFIG_URI" \
+    -e ZENOH_SESSION_CONFIG_URI="$ZENOH_SESSION_CONFIG_URI" \
+    -e ZENOH_CONFIG_OVERRIDE="$ZENOH_CONFIG_JOIN_OVERRIDE" \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
