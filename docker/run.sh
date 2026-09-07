@@ -60,6 +60,7 @@ docker run --pull=always -it --rm --net host --privileged \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
     -e ZENOH_ROUTER_CONFIG_URI=/turtlebot_ws/zenoh/ROUTER_CONFIG.json5 \
+    -e ZENOH_SESSION_CONFIG_URI=/turtlebot_ws/zenoh/SESSION_CONFIG.json5 \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
