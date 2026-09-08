@@ -1,0 +1,19 @@
+{
+  mode: "router",
+
+  listen: {
+    endpoints: ["udp/0.0.0.0:7447"]
+  },
+
+  scouting: {
+    multicast: {
+      enabled: false
+    }
+  },
+
+  transport: {
+    link: {
+      protocols: ["udp"]
+    }
+  }
+}

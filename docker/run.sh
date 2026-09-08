@@ -5,6 +5,7 @@
 
 BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger_cam
+ZENOH_CONFIG_JOIN_OVERRIDE=""
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
@@ -16,6 +17,7 @@ Usage: run.sh [-b|bash] [-m|--model] turtlebot3_model [-h|--help]
 
 Where:
     -b | bash       Open bash in docker container
+    -j (Opt: ip)    Override Zenoh default config to connect to remote router
     -m | --model    Set turtlebot3 model (e.g. "burger_cam" or "waffle_pi")
     -h | --help     Show this help message
     "
@@ -27,6 +29,14 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -b|bash)
             BASH_CMD=bash
+            ;;
+        -j)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["udp/'"$2"':7447"]'
+                shift
+            else
+                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["udp/192.168.1.100:7447"]'
+            fi
             ;;
         -m|--model)
             if [[ -n "$2" && "$2" != -* ]]; then
@@ -52,17 +62,21 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run --pull=always -it --rm --net host --privileged \
+docker run -it --rm --net host --privileged \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \
     -e XAUTHORITY="${XAUTHORITY}" \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
+    -e ZENOH_ROUTER_CONFIG_URI="/turtlebot_ws/zenoh/ROUTER_CONFIG.json5" \
+    -e ZENOH_SESSION_CONFIG_URI="/turtlebot_ws/zenoh/SESSION_CONFIG.json5" \
+    -e ZENOH_CONFIG_OVERRIDE="$ZENOH_CONFIG_JOIN_OVERRIDE" \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
     -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
-    ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
+    -v $WS_PATH/zenoh:/turtlebot_ws/zenoh \
+    docker.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
