@@ -20,6 +20,7 @@ RUN apt-get update \
     python3-osrf-pycommon \
     python3-vcstool \
     # Dev tools
+    nano \
     ack \
     bmon \
     cloc \
@@ -32,6 +33,8 @@ RUN apt-get update \
     psmisc \
     tmux \
     xterm \
+    # Window manager control to force GUI windows always on top
+    wmctrl \
     # ROS dependencies
     ros-"$ROS_DISTRO"-compressed-image-transport \
     ros-"$ROS_DISTRO"-compressed-depth-image-transport \
@@ -50,6 +53,8 @@ RUN apt-get update \
     ros-"$ROS_DISTRO"-cartographer-ros \
     ros-"$ROS_DISTRO"-navigation2 \
     ros-"$ROS_DISTRO"-nav2-bringup \
+    # Perception + Apriltags
+    ros-"$ROS_DISTRO"-apriltag-ros \
  && rm -rf /var/lib/apt/lists/*
 
 # Setup Zenoh ROS2 RMW
