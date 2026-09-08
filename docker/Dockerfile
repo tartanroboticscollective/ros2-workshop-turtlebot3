@@ -33,7 +33,7 @@ RUN apt-get update \
     psmisc \
     tmux \
     xterm \
-    # Window manager control to force GUI windows always on top 
+    # Window manager control to force GUI windows always on top
     wmctrl \
     # ROS dependencies
     ros-"$ROS_DISTRO"-compressed-image-transport \
