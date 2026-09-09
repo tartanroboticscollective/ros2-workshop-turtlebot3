@@ -49,4 +49,4 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker exec -it ros2-workshop-turtlebot3 $BASH_CMD
+podman --root /disk/scratch/$USER/root exec -it ros2-workshop-turtlebot3 $BASH_CMD
