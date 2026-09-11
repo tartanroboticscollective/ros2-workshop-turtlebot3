@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # tiny fix amd gpu PLEASE DONT REMOVE
-#xhost +
+xhost +
 
 
 SESSION_NAME="ros2-workshop"

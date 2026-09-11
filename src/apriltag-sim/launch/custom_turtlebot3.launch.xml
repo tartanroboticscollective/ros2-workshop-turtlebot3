@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="x_pose" default="0.0"/>
+  <arg name="y_pose" default="0.0"/>
+
+  <!--
+    Load the project's URDF directly. type="str" prevents the URDF XML from being
+    interpreted as YAML while it is passed to robot_state_publisher.
+  -->
+  <node pkg="robot_state_publisher" exec="robot_state_publisher"
+        name="robot_state_publisher" output="screen">
+    <param name="use_sim_time" value="$(var use_sim_time)" type="bool"/>
+    <param name="robot_description" type="str"
+           value="$(command 'cat $(find-pkg-share apriltag-sim)/urdf/turtlebot_custom.urdf')"/>
+  </node>
+
+  <node pkg="ros_gz_sim" exec="create" output="screen"
+        args="-name $(env TURTLEBOT3_MODEL) -file $(find-pkg-share apriltag-sim)/models/turtlebot3_burger_cam_custom/model.sdf -x $(var x_pose) -y $(var y_pose) -z 0.01"/>
+
+  <node pkg="ros_gz_bridge" exec="parameter_bridge" output="screen"
+        args="--ros-args -p config_file:=$(find-pkg-share apriltag-sim)/config/custom_turtlebot3_bridge.yaml"/>
+
+  <node pkg="ros_gz_image" exec="image_bridge" output="screen"
+        args="/camera/image_raw"/>
+</launch>

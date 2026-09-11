@@ -6,10 +6,12 @@
 
   <append_env name="GZ_SIM_RESOURCE_PATH"
               value="$(find-pkg-share apriltag-sim)/models"/>
+  <append_env name="GZ_SIM_RESOURCE_PATH"
+              value="$(find-pkg-share turtlebot3_gazebo)/models"/>
 
   <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
     <arg name="gz_args"
-         value="-r -s -v2 $(find-pkg-share apriltag-sim)/worlds/apriltab-box.world"/>
+         value="-r -s -v2 $(find-pkg-share apriltag-sim)/worlds/apriltag-box.world"/>
     <arg name="on_exit_shutdown" value="true"/>
   </include>
 
@@ -18,11 +20,13 @@
     <arg name="on_exit_shutdown" value="true"/>
   </include>
 
-  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/robot_state_publisher.launch.py">
+  <!--
+    The stock TurtleBot3 launch files derive their URDF and SDF from
+    TURTLEBOT3_MODEL. Use the local XML launch so the custom files win while the
+    environment variable remains set for the rest of the TurtleBot stack.
+  -->
+  <include file="$(find-pkg-share apriltag-sim)/launch/custom_turtlebot3.launch.xml">
     <arg name="use_sim_time" value="$(var use_sim_time)"/>
-  </include>
-
-  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/spawn_turtlebot3.launch.py">
     <arg name="x_pose" value="$(var x_pose)"/>
     <arg name="y_pose" value="$(var y_pose)"/>
   </include>
@@ -31,4 +35,14 @@
     <arg name="use_sim_time" value="$(var use_sim_time)"/>
     <arg name="map" value="$(find-pkg-share apriltag-sim)/map/map.yaml"/>
   </include>
+
+  <!-- Apriltag -->
+  <arg name="image_topic" default="/camera/image_raw" />
+  <arg name="info_topic" default="/camera/camera_info" />
+
+  <node pkg="apriltag_ros" exec="apriltag_node" name="apriltag_node" output="screen">
+    <remap from="image_rect" to="$(var image_topic)" />
+    <remap from="camera_info" to="$(var info_topic)" />
+    <param from="$(find-pkg-share apriltag-sim)/config/apriltag_36h11_sim.yaml" />
+  </node>
 </launch>

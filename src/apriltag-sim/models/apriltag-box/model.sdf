@@ -15,6 +15,7 @@
       </collision>
 
       <visual name="walls">
+        <cast_shadows>false</cast_shadows>
         <geometry>
           <mesh>
             <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
@@ -23,6 +24,7 @@
       </visual>
 
       <visual name="tags">
+        <cast_shadows>false</cast_shadows>
         <geometry>
           <mesh>
             <uri>model://apriltag-box/meshes/tags/tags.obj</uri>
