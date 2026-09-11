@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="apriltag-box">
+    <static>true</static>
+    <!-- The OBJ's Bottom face is local X=0; rotate it onto Gazebo's Z=0 plane. -->
+    <pose>0 0 0 0 -1.57079632679 0</pose>
+
+    <link name="walls_link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <visual name="walls">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <mesh>
+            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <visual name="tags">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <mesh>
+            <uri>model://apriltag-box/meshes/tags/tags.obj</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

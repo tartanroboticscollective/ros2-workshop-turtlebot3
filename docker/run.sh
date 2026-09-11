@@ -1,10 +1,13 @@
 #!/bin/bash
 # ----------------------------------------------------------------
-# Build docker dev stage and add local code for live development
+# Pull and run workshop docker container
 # ----------------------------------------------------------------
 
 BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
-TURTLEBOT3_MODEL=burger
+TURTLEBOT3_MODEL=burger_cam
+
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+WS_PATH="${SCRIPT_PATH%/*/*}"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
@@ -12,10 +15,11 @@ WS_PATH="${SCRIPT_PATH%/*/*}"
 # Function to print usage
 usage() {
     echo "
-Usage: run.sh [-b|bash] [-h|--help]
+Usage: run.sh [-b|bash] [-m|--model] turtlebot3_model [-h|--help]
 
 Where:
     -b | bash       Open bash in docker container
+    -m | --model    Set turtlebot3 model (e.g. "burger_cam" or "waffle_pi")
     -h | --help     Show this help message
     "
     exit 1
@@ -26,6 +30,15 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -b|bash)
             BASH_CMD=bash
+            ;;
+        -m|--model)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                TURTLEBOT3_MODEL="$2"
+                shift
+            else
+                echo "Error: Missing turtlebot3 model name after $1"
+                usage
+            fi
             ;;
         -h|--help)
             usage
@@ -42,7 +55,7 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run -it --rm --net host --privileged \
+docker run --pull=always -it --rm --net host --privileged \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \

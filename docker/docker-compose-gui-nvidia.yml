@@ -1,9 +1,0 @@
-services:
-  ros2-workshop-turtlebot3:
-    extends:
-      file: docker-compose-gui.yml
-      service: ros2-workshop-turtlebot3
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=all
-    runtime: nvidia

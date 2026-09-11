@@ -2,7 +2,7 @@ services:
   ros2-workshop-turtlebot3:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile # TODO: update this with tartan docker hub image
       target: dev
       args:
         - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
@@ -10,25 +10,22 @@ services:
         - UID=${UID}
         - GID=${GID}
     container_name: ros2-workshop-turtlebot3
-    environment:
-      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-      # Limit ROS communication to local computer only
-      #- ROS_LOCALHOST_ONLY=1
-      - YOUR_IP=${YOUR_IP}
-      - ROBOT_IP=${ROBOT_IP}
-      - TURTLEBOT3_MODEL=burger
+    env_file:
+      - turtlebot.env
     extra_hosts:
       - "${ROBOT_HOSTNAME}:${ROBOT_IP}"
     # Required for communicating over the network
     network_mode: "host"
     # Required for accessing hardware
-    #privileged: true
+    privileged: true
     tty: true
+    stdin_open: true
     volumes:
-      # Required for accessing hardware
-      #- /dev:/dev
-      # Required for accessing storage media
-      #- /media:/media
       - ../src:${AMENT_WORKSPACE_DIR}/src
-      # Required for ROS 2 shared memory communication
-      #- /dev/shm:/dev/shm
+      - /dev/shm:/dev/shm
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - /dev:/dev
+      - /tmp:/tmp
+      - /etc/localtime:/etc/localtime:ro
+      - ../config/default.rviz:/home/${USERNAME:-developer}/.rviz2/default.rviz
