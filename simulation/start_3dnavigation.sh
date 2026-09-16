@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ----------------------------------------------------------------
 # Run Simulation - 3D Navigation session
 # ----------------------------------------------------------------
@@ -42,7 +42,6 @@ CONTAINER_NAME="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
-
 
 # ================================================================
 # Docker helpers
@@ -156,7 +155,8 @@ tmux send-keys -t "$MAIN_PANE" \
     "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL terminal" C-m
 
 tmux send-keys -t "$TELEOP_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m \
+    "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL terminal" C-m \
+    "echo 'WARNING: Running teleoperation while Navigation is running sends conflicting commands to the turtlebot!'" C-m \
     "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
 
 tmux send-keys -t "$ZENOH_PANE" \

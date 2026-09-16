@@ -9,9 +9,6 @@ TURTLEBOT3_MODEL=burger_cam
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-WS_PATH="${SCRIPT_PATH%/*/*}"
-
 # Function to print usage
 usage() {
     echo "
