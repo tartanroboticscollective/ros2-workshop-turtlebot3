@@ -1,18 +1,19 @@
 #!/bin/bash
 # ----------------------------------------------------------------
-# Build docker dev stage and add local code for live development
+# Attach to already running workshop docker container
 # ----------------------------------------------------------------
 
 BASH_CMD="bash"
-TURTLEBOT3_MODEL=burger
+TURTLEBOT3_MODEL=burger_cam
 
 # Function to print usage
 usage() {
     echo "
-Usage: run.sh [-b|bash] [-h|--help]
+Usage: attach.sh [-b|bash] [-m|--model] turtlebot3_model [-h|--help]
 
 Where:
-    -b | bash       Open bash in docker container
+    -b | bash       Open bash in docker container (Default in attach.sh)
+    -m | --model    Set turtlebot3 model (e.g. "burger_cam" or "waffle_pi")
     -h | --help     Show this help message
     "
     exit 1
@@ -23,6 +24,15 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -b|bash)
             BASH_CMD=bash
+            ;;
+        -m|--model)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                TURTLEBOT3_MODEL="$2"
+                shift
+            else
+                echo "Error: Missing turtlebot3 model name after $1"
+                usage
+            fi
             ;;
         -h|--help)
             usage
