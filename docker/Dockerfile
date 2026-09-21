@@ -72,53 +72,34 @@ FROM base AS dev
 
 RUN apt-get update && apt-get full-upgrade -y --quiet
 
-ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
 ARG USERNAME="developer"
 ARG UID=1000
 ARG GID=1000
 
+# Remove annoying default ubuntu user with conflicting id
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
+
+# Setup local user inside docker container and change directory ownership
+RUN groupadd -g $GID $USERNAME && \
+    useradd -u $UID -g $GID -m -l $USERNAME && \
+    usermod -aG sudo $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    chown -R "$USERNAME" /home/"$USERNAME" "$AMENT_WORKSPACE_DIR"
+
+USER ${USERNAME}
+
 # Clone turtlebot3 repo dependencies not available through apt
 COPY docker/.repos $AMENT_WORKSPACE_DIR/src/.repos
-RUN vcs import --input src/.repos src
+RUN sudo vcs import --input src/.repos src
 
 # # Source ROS setup for dependencies and build our code
 RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
     && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-# Match the development user to the host so bind-mounted files stay writable.
-# Synching the container's user and group permissions with the host machine during a Docker build.
-RUN set -eux; \
-    if getent group "${GID}" >/dev/null; then \
-        group_name="$(getent group "${GID}" | cut -d: -f1)"; \
-    else \
-        groupadd --gid "${GID}" "${USERNAME}"; \
-        group_name="${USERNAME}"; \
-    fi; \
-    if getent passwd "${UID}" >/dev/null; then \
-        existing_user="$(getent passwd "${UID}" | cut -d: -f1)"; \
-        if [ "${existing_user}" != "${USERNAME}" ]; then \
-            usermod --login "${USERNAME}" --home "/home/${USERNAME}" --move-home "${existing_user}"; \
-        fi; \
-    else \
-        useradd --uid "${UID}" --gid "${group_name}" --create-home --shell /bin/bash "${USERNAME}"; \
-    fi; \
-    usermod --gid "${GID}" --shell /bin/bash "${USERNAME}"; \
-    install -d --owner "${UID}" --group "${GID}" "/home/${USERNAME}/.rviz2"; \
-    chown -R "${UID}:${GID}" "${AMENT_WORKSPACE_DIR}" "/home/${USERNAME}"
-
-# Copy pre-configured rviz layout configuration
-COPY ./config/default.rviz /tmp/default.rviz
-RUN install --owner "${UID}" --group "${GID}" --mode 0644 \
-        /tmp/default.rviz "/home/${USERNAME}/.rviz2/default.rviz" \
-    && rm /tmp/default.rviz
-
 RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> "/home/${USERNAME}/.bashrc" \
  && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> "/home/${USERNAME}/.bashrc" \
  && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> "/home/${USERNAME}/.bashrc" \
- && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> "/home/${USERNAME}/.bashrc" \
- && chown "${UID}:${GID}" "/home/${USERNAME}/.bashrc"
-
-USER ${USERNAME}
+ && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> "/home/${USERNAME}/.bashrc"
 
 # Don't run any ROS commands by default
 CMD ["bash"]
