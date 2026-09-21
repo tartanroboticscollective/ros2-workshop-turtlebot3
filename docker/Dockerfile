@@ -11,7 +11,7 @@ WORKDIR $AMENT_WORKSPACE_DIR
 
 RUN apt-get update \
     &&  apt-get full-upgrade -y --quiet \
-    &&  DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \    
+    &&  DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
     # Core dependencies
     git \
     mesa-utils \
