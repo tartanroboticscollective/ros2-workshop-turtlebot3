@@ -4,41 +4,38 @@
 ![Issues](https://img.shields.io/github/issues/tartanroboticscollective/ros2-workshop-turtlebot3)
 ![Latest Release](https://img.shields.io/github/v/tag/tartanroboticscollective/ros2-workshop-turtlebot3.svg)
 
-## 0. Set-up
-This dev environment uses [`vcstool`](http://wiki.ros.org/vcstool) to pull the dependencies repos. Please import them with the following command before building the docker:
 
-```
-$ cd src/
-$ vcs import < .repos
-```
+## 0: Introduction
 
+First Exercise
 
-## 1. Running
+## 1: Simulation
 
-### CLI
+Second Exercise
 
-To run the tmux script:
+## 2: Apriltag
 
-```bash
-$ ./start_sesh.sh
-```
+Final Exercise
 
-**OR**, to build and run the docker container manually, first:
+### Real Turtlebot
 
-```bash
-$ ./dev.sh
-```
+Instructions for real TurtleBot
 
-Which will build and run zenoh in the container.
+### Simulated Turtlebot
 
-Then, to connect to the running Docker container:
+Run `./2_apriltagsim/dev_session.sh`
 
-```bash
-$ docker exec -it ros2-workshop-turtlebot3 bash
-```
+type `export TURTLEBOT3_MODEL=burger_cam`
+
+type `rbuild`
+
+type `rsource`
+
+type `ros2 launch apriltag-sim apriltag_world.launch.xml`
 
 
-## 2. FAQ
+---
+### FAQ
 
 In order to be able to run **graphical user interfaces** from inside the Docker you might have to type
 

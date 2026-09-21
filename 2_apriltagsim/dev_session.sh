@@ -9,7 +9,7 @@ CONTAINER_NAME="ros2-workshop-turtlebot3"
 COMPOSE_SERVICE="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-WS_PATH="$(dirname "$SCRIPT_PATH")"
+WS_PATH="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 COMPOSE_FILE="$WS_PATH/docker/docker-compose.yml"
 COMPOSE_ENV_FILE="$WS_PATH/docker/turtlebot.env"
 

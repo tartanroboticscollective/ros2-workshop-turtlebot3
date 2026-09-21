@@ -70,9 +70,11 @@ ENV RCUTILS_COLORIZED_OUTPUT=1
 #####################
 FROM base AS dev
 
-RUN apt-get update && apt-get full-upgrade -y --quiet
+RUN apt-get update && apt-get full-upgrade -y --quiet \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-ARG USERNAME="developer"
+ARG DEV_USER="developer"
 ARG UID=1000
 ARG GID=1000
 
@@ -80,26 +82,27 @@ ARG GID=1000
 RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
 
 # Setup local user inside docker container and change directory ownership
-RUN groupadd -g $GID $USERNAME && \
-    useradd -u $UID -g $GID -m -l $USERNAME && \
-    usermod -aG sudo $USERNAME && \
-    echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    chown -R "$USERNAME" /home/"$USERNAME" "$AMENT_WORKSPACE_DIR"
-
-USER ${USERNAME}
+RUN groupadd -g $GID $DEV_USER && \
+    useradd -u $UID -g $GID -m -l $DEV_USER && \
+    usermod -aG sudo $DEV_USER && \
+    echo "$DEV_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    chown -R "$DEV_USER" /home/"$DEV_USER" "$AMENT_WORKSPACE_DIR"
 
 # Clone turtlebot3 repo dependencies not available through apt
 COPY docker/.repos $AMENT_WORKSPACE_DIR/src/.repos
-RUN sudo vcs import --input src/.repos src
+RUN vcs import --input src/.repos src
+
+USER ${DEV_USER}
+
 
 # # Source ROS setup for dependencies and build our code
 RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
-    && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+    && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> "/home/${USERNAME}/.bashrc" \
- && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> "/home/${USERNAME}/.bashrc" \
- && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> "/home/${USERNAME}/.bashrc" \
- && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> "/home/${USERNAME}/.bashrc"
+RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> "/home/${DEV_USER}/.bashrc"
 
 # Don't run any ROS commands by default
 CMD ["bash"]
