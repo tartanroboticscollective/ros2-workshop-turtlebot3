@@ -10,8 +10,8 @@ ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
 WORKDIR $AMENT_WORKSPACE_DIR
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive \
-        apt-get -y --quiet --no-install-recommends install \
+    &&  apt-get full-upgrade -y --quiet \
+    &&  DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \    
     # Core dependencies
     git \
     mesa-utils \
@@ -55,6 +55,7 @@ RUN apt-get update \
     ros-"$ROS_DISTRO"-nav2-bringup \
     # Perception + Apriltags
     ros-"$ROS_DISTRO"-apriltag-ros \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 # Setup Zenoh ROS2 RMW
@@ -69,10 +70,6 @@ ENV RCUTILS_COLORIZED_OUTPUT=1
 # Development layer #
 #####################
 FROM base AS dev
-
-RUN apt-get update && apt-get full-upgrade -y --quiet \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 ARG DEV_USER="developer"
 ARG UID=1000
@@ -93,7 +90,6 @@ COPY docker/.repos $AMENT_WORKSPACE_DIR/src/.repos
 RUN vcs import --input src/.repos src
 
 USER ${DEV_USER}
-
 
 # # Source ROS setup for dependencies and build our code
 RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
