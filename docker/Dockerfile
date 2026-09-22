@@ -55,6 +55,11 @@ RUN apt-get update \
     ros-"$ROS_DISTRO"-nav2-bringup \
     # Perception + Apriltags
     ros-"$ROS_DISTRO"-apriltag-ros \
+    # Turtlebot 3 simulation and dependencies
+    ros-"$ROS_DISTRO"-turtlebot3 \
+    ros-"$ROS_DISTRO"-turtlebot3-gazebo \
+    ros-"$ROS_DISTRO"-turtlebot3-msgs \
+    ros-"$ROS_DISTRO"-dynamixel-sdk \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -85,16 +90,9 @@ RUN groupadd -g $GID $DEV_USER && \
     echo "$DEV_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     chown -R "$DEV_USER" /home/"$DEV_USER" "$AMENT_WORKSPACE_DIR"
 
-# Clone turtlebot3 repo dependencies not available through apt
-COPY docker/.repos $AMENT_WORKSPACE_DIR/src/.repos
-RUN vcs import --input src/.repos src
-
 USER ${DEV_USER}
 
-# # Source ROS setup for dependencies and build our code
-RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
-    && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
-
+# Set aliases
 RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> "/home/${DEV_USER}/.bashrc" \
  && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> "/home/${DEV_USER}/.bashrc" \
  && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> "/home/${DEV_USER}/.bashrc" \
