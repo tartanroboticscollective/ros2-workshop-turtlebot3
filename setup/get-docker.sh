@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 # Docker Engine for Linux installation script.
 #
@@ -326,11 +326,13 @@ get_distribution() {
     echo "$lsb_dist"
 }
 
-reboot () {
-    echo 'Reboot now? (y/n)' &&
-    read x &&
-    [[ "$x" == "y" ]] &&
-    /sbin/reboot;
+reboot() {
+    echo 'Reboot now? (y/n)'
+    read -r x
+
+    if [[ "$x" == "y" ]]; then
+        /sbin/reboot
+    fi
 }
 
 linux_post_install() {
