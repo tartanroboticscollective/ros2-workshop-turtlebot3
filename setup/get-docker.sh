@@ -326,6 +326,13 @@ get_distribution() {
     echo "$lsb_dist"
 }
 
+reboot () {
+    echo 'Reboot now? (y/n)' &&
+    read x &&
+    [[ "$x" == "y" ]] &&
+    /sbin/reboot;
+}
+
 linux_post_install() {
     # Create the docker group if it doesn't already exist.
     if ! getent group docker > /dev/null 2>&1; then
@@ -350,6 +357,7 @@ linux_post_install() {
     echo
     echo "Docker group membership has been configured."
     echo "Please log out and back in (or reboot) for the change to apply to your normal shell."
+    reboot
 }
 
 start_docker_daemon() {
