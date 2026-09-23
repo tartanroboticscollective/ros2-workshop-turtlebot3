@@ -88,6 +88,8 @@ The repository contains all the TODO that will be used during the workshop. Havi
 
 [Simulation Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Simulation)
 
+![alt text](media/test_2.gif "3D Sim Teleop")
+
 ### 2: Apriltag Simulation
 
 [Apriltag Simulation Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/AprilTag%E2%80%90Simulation)
