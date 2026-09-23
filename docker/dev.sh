@@ -52,7 +52,7 @@ done
 DOCKER_BUILDKIT=1 docker build \
     --build-arg USER_ID=$(id -u) \
     --build-arg GROUP_ID=$(id -g) \
-    --build-arg USERNAME=$(whoami) \
+    --build-arg DEV_USER=developer \
     -t ros2-workshop-turtlebot3:latest-dev \
     -f $WS_PATH/docker/Dockerfile --target dev .
 
@@ -71,7 +71,7 @@ docker run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v $WS_PATH/config/default.rviz:/home/${USERNAME}/.rviz2/default.rviz \
+    -v $WS_PATH/config/default.rviz:/home/developer/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
     ros2-workshop-turtlebot3:latest-dev $BASH_CMD

@@ -63,7 +63,7 @@ docker run --pull=always -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v $WS_PATH/config/default.rviz:/home/${USERNAME}/.rviz2/default.rviz \
+    -v $WS_PATH/config/default.rviz:/home/developer/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
     ghcr.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest $BASH_CMD
