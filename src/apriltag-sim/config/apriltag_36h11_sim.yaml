@@ -1,0 +1,24 @@
+/**:
+  ros__parameters:
+    image_transport: raw
+    family: 36h11
+    size: 0.2
+    max_hamming: 0
+    qos_profile: default
+    pose_estimation_method: pnp
+
+    detector:
+      threads: 1
+      decimate: 2.0
+      blur: 0.0
+      refine: true
+      sharpening: 0.25
+      debug: false
+
+    # The scene texture contains tag36h11 IDs 0 through 3. The tag faces in
+    # tags.obj are 0.20 m square, so this also gives pose estimation the right
+    # physical scale.
+    tag:
+      ids: [0, 1, 2, 3]
+      frames: [tag36h11_0, tag36h11_1, tag36h11_2, tag36h11_3]
+      sizes: [0.2, 0.2, 0.2, 0.2]

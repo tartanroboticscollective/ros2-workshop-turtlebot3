@@ -10,8 +10,8 @@ ARG AMENT_WORKSPACE_DIR="/turtlebot_ws"
 WORKDIR $AMENT_WORKSPACE_DIR
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive \
-        apt-get -y --quiet --no-install-recommends install \
+    &&  apt-get full-upgrade -y --quiet \
+    &&  DEBIAN_FRONTEND=noninteractive apt-get -y --quiet --no-install-recommends install \
     # Core dependencies
     git \
     mesa-utils \
@@ -55,6 +55,12 @@ RUN apt-get update \
     ros-"$ROS_DISTRO"-nav2-bringup \
     # Perception + Apriltags
     ros-"$ROS_DISTRO"-apriltag-ros \
+    # Turtlebot 3 simulation and dependencies
+    ros-"$ROS_DISTRO"-turtlebot3 \
+    ros-"$ROS_DISTRO"-turtlebot3-gazebo \
+    ros-"$ROS_DISTRO"-turtlebot3-msgs \
+    ros-"$ROS_DISTRO"-dynamixel-sdk \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 # Setup Zenoh ROS2 RMW
@@ -70,21 +76,27 @@ ENV RCUTILS_COLORIZED_OUTPUT=1
 #####################
 FROM base AS dev
 
-# Clone turtlebot3 repo dependencies not available through apt
-COPY ./src/.repos $AMENT_WORKSPACE_DIR/src/.repos
-RUN vcs import --input src/.repos src
+ARG DEV_USER="developer"
+ARG UID=1000
+ARG GID=1000
 
-# # Source ROS setup for dependencies and build our code
-RUN . /opt/ros/"$ROS_DISTRO"/setup.sh \
-    && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+# Remove annoying default ubuntu user with conflicting id
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
 
-# Copy pre-configured rviz layout configuration
-COPY ./config/default.rviz /root/.rviz2/default.rviz
+# Setup local user inside docker container and change directory ownership
+RUN groupadd -g $GID $DEV_USER && \
+    useradd -u $UID -g $GID -m -l $DEV_USER && \
+    usermod -aG sudo $DEV_USER && \
+    echo "$DEV_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    chown -R "$DEV_USER" /home/"$DEV_USER" "$AMENT_WORKSPACE_DIR"
 
-RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> /root/.bashrc \
- && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> /root/.bashrc \
- && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> /root/.bashrc \
- && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc
+USER ${DEV_USER}
+
+# Set aliases
+RUN echo "alias rsource='source ${AMENT_WORKSPACE_DIR}/install/setup.bash'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "alias rbuild='(cd ${AMENT_WORKSPACE_DIR} && colcon build --symlink-install)'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "alias rclean='(cd ${AMENT_WORKSPACE_DIR} && colcon clean workspace -y)'" >> "/home/${DEV_USER}/.bashrc" \
+ && echo "rsource || source /opt/ros/${ROS_DISTRO}/setup.bash" >> "/home/${DEV_USER}/.bashrc"
 
 # Don't run any ROS commands by default
 CMD ["bash"]

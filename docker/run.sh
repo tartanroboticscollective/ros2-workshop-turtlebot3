@@ -62,8 +62,9 @@ done
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-podman --root /disk/scratch/$USER/root run -it --rm --net host --privileged \
-    --shm-size=512m \
+podman --root /disk/scratch/$USER/root run --pull=always -it --rm --net host --privileged \
+    --shm-size=512m
+    --user "$(id -u):$(id -g)" \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \
@@ -76,7 +77,7 @@ podman --root /disk/scratch/$USER/root run -it --rm --net host --privileged \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
-    -v $WS_PATH/config/default.rviz:/root/.rviz2/default.rviz \
+    -v $WS_PATH/config/default.rviz:/home/developer/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
     -v $WS_PATH/zenoh:/turtlebot_ws/zenoh \
