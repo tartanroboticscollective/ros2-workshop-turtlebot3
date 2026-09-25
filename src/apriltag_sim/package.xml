@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>apriltag-sim</name>
+  <name>apriltag_sim</name>
   <version>0.0.0</version>
   <description>Gazebo Sim AprilTag box world for TurtleBot3.</description>
   <maintainer email="emanuele@todo.todo">emanuele</maintainer>
