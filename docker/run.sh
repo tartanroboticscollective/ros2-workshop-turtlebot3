@@ -58,11 +58,14 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+# Always check and pull latest docker img, without failing if without internet
+docker pull docker.io/tartanroboticscollective/ros2-workshop-turtlebot3:latest
+
 # GUI setup
 xhost + >/dev/null
 
 # Run docker image with local code volumes for development
-docker run --pull=always -it --rm --net host --privileged \
+docker run -it --rm --net host --privileged \
     --user "$(id -u):$(id -g)" \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
