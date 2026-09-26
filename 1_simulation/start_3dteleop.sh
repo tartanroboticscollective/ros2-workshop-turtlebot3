@@ -84,7 +84,7 @@ case "${1:-}" in
 
     zenoh)
         echo "Running run.sh..."
-        $WS_PATH/docker/run.sh -m $TURTLEBOT3_MODEL
+        $WS_PATH/docker/dev.sh -m $TURTLEBOT3_MODEL
         ;;
 
     teleop)

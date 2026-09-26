@@ -71,10 +71,18 @@ xhost + >/dev/null
 
 # Run docker image with local code volumes for development
 docker run -it --rm --net host --privileged \
+    --gpus all \
+    --runtime nvidia \
+    -e NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all} \
+    -e NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all} \
     --user "$(id -u):$(id -g)" \
     --name ros2-workshop-turtlebot3 \
     -e DISPLAY="$DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -e QT_X11_NO_MITSHM=1 \
+    -e QT_QPA_PLATFORM=xcb \
+    -e "WAYLAND_DISPLAY=$WAYLAND_DISPLAY" \
+    -e "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR" \
+    -v "/dev/dri:/dev/dri" \
     -e XAUTHORITY="${XAUTHORITY}" \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \

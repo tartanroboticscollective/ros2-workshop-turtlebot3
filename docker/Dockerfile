@@ -88,7 +88,8 @@ RUN groupadd -g $GID $DEV_USER && \
     useradd -u $UID -g $GID -m -l $DEV_USER && \
     usermod -aG sudo $DEV_USER && \
     echo "$DEV_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    chown -R "$DEV_USER" /home/"$DEV_USER" "$AMENT_WORKSPACE_DIR"
+    chown -R "$DEV_USER" /home/"$DEV_USER" "$AMENT_WORKSPACE_DIR" && \
+    mkdir /run/user/1000/ && chmod 0700 /run/user/1000/
 
 USER ${DEV_USER}
 
