@@ -1,0 +1,4 @@
+int32 tag_id  # Valid tag IDs are 0 through 3.
+---
+bool found
+geometry_msgs/Vector3 goal_position  # Position in the tag transform's parent frame, in meters.
