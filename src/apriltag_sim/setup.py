@@ -90,8 +90,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'apriltag_sim_service = '
-            'apriltag_sim.apriltag_sim_service:main',
+            'apriltag_sim_service = ' 'apriltag_sim.apriltag_sim_service:main',
         ],
     },
 )
