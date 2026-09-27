@@ -43,7 +43,7 @@ class AprilTagSimService(Node):
     def _on_detections(self, message):
         for tag in message.detections: 
             self._detected_tags[tag.id] = (tag.centre.x, tag.centre.y)
-        self.get_logger().warn(f'Lenght {len(self._detected_tags.keys())}')
+        #self.get_logger().warn(f'Lenght {len(self._detected_tags.keys())}')
 
     def _rotate_turtlebot(self):
         rot_msg = TwistStamped()
