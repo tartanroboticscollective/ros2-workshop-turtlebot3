@@ -1,6 +1,9 @@
 """Service for querying detected AprilTags in the simulation."""
 
 import rclpy
+import threading
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.clock import Clock
 from rclpy.qos import QoSProfile
 from geometry_msgs.msg import TwistStamped
@@ -23,10 +26,13 @@ class AprilTagSimService(Node):
 
         # for Apriltag detection topic
         self._detected_tags = {}
-        self.rate = self.create_rate(1)
+
+        self._tag_detection_group = MutuallyExclusiveCallbackGroup()
+        self.rate = self.create_rate(5)
         self.create_subscription(
-            AprilTagDetectionArray, '/detections', self._on_detections, 10
+            AprilTagDetectionArray, '/detections', self._on_detections, 10, callback_group= self._tag_detection_group
         )
+
 
         self.create_service(FindTag, 'find_tag', self._srv_find_tag)
         self.get_logger().info('FindTag service ready: /find_tag')
@@ -36,8 +42,9 @@ class AprilTagSimService(Node):
 
     def _on_detections(self, message):
         for tag in message.detections: 
-            self._detected_tags[tag.id] = tag.centre
+            self._detected_tags[tag.id] = (tag.centre.x, tag.centre.y)
         self.get_logger().warn(f'Lenght {len(self._detected_tags.keys())}')
+
     def _rotate_turtlebot(self):
         rot_msg = TwistStamped()
         rot_msg.header.stamp = Clock().now().to_msg()
@@ -69,33 +76,43 @@ class AprilTagSimService(Node):
     def _tag_detected(self, tag_id):
         return 0 <= tag_id <= 3 and tag_id in self._detected_tags.keys()
 
-    def _srv_find_tag(self, request, response):
-        tag_id = request.tag_id
-
+    def _search_tag(self, tag_id):
         # Rotate turtlebot on place until the tag number is detected
         while (not self._tag_detected(tag_id)):
             self._rotate_turtlebot()
             self.rate.sleep()
-
         # Tag found!
         self._stop_turtlebot()
         self.get_logger().info(f'Found Tag {tag_id}', once=True)
 
+    def _srv_find_tag(self, request, response):
+        self._detected_tags.clear()
+
+        tag_id = request.tag_id
+
+        # thread to rotate tb and no blocking subscribers here
+        self.tb_search_thread = threading.Thread(target=self._search_tag, args=(tag_id,), daemon=True)
+        self.tb_search_thread.start()
+        self.tb_search_thread.join()
         # Service Output
-        position = self._tag_positions.get(tag_id)
+        position = self._detected_tags.get(tag_id)
 
         response.found = True
         if response.found:
-            response.tag_position.x = position.x
-            response.tag_position.y = position.y
+            response.tag_position.x = position[0]
+            response.tag_position.y = position[1]
         return response
 
 
 def main(args=None):
     rclpy.init(args=args)
     node = AprilTagSimService()
+
+    multi_thread_exec = MultiThreadedExecutor(num_threads=2)
+    multi_thread_exec.add_node(node)
+
     try:
-        rclpy.spin(node)
+        multi_thread_exec.spin()
     except KeyboardInterrupt:
         pass
     finally:
