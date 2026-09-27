@@ -84,21 +84,6 @@ repos:
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cu|c\+\+|cxx|tpp|txx)$
         args: ["--linelength=100", "--filter=-legal/copyright,-build/include_order"]
 
-  # Cmake hooks
-  - repo: local
-    hooks:
-      - id: ament_lint_cmake
-        name: ament_lint_cmake
-        description: Check format of CMakeLists.txt files.
-        entry: ament_lint_cmake
-        language: system
-        files: CMakeLists\.txt$
-
-  - repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-      - id: cmake-format
-
   # Yaml formatting
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.38.0
