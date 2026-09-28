@@ -41,7 +41,7 @@ class AprilTagSimService(Node):
             callback_group=self._tag_detection_group,
         )
 
-        self.create_service(FindTag, 'find_tag', self._srv_find_tag)
+        self.create_service(FindTag, '/apriltag_sim_service/find_tag', self._srv_find_tag)
         self.get_logger().info('FindTag service ready: /find_tag')
 
         # turtlebot cmd vel
