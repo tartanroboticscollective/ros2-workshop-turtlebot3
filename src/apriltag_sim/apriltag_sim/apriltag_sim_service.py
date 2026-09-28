@@ -41,7 +41,9 @@ class AprilTagSimService(Node):
             callback_group=self._tag_detection_group,
         )
 
-        self.create_service(FindTag, '/apriltag_sim_service/find_tag', self._srv_find_tag)
+        self.create_service(
+            FindTag, '/apriltag_sim_service/find_tag', self._srv_find_tag
+        )
         self.get_logger().info('FindTag service ready: /find_tag')
 
         # turtlebot cmd vel
@@ -100,7 +102,9 @@ class AprilTagSimService(Node):
         tag_id = request.tag_id
 
         if tag_id < 0 or tag_id > 3:
-            self.get_logger().error(f'ID {tag_id} not allowed. Tags IDs allowed [0,3]')
+            self.get_logger().error(
+                f'ID {tag_id} not allowed. Tags IDs allowed [0,3]'
+            )
             response.found = False
             return response
 
