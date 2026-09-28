@@ -99,6 +99,11 @@ class AprilTagSimService(Node):
 
         tag_id = request.tag_id
 
+        if tag_id < 0 or tag_id > 3:
+            self.get_logger().error(f'ID {tag_id} not allowed. Tags IDs allowed [0,3]')
+            response.found = False
+            return response
+
         # thread to rotate tb and no blocking subscribers here
         self.tb_search_thread = threading.Thread(
             target=self._search_tag, args=(tag_id,), daemon=True
