@@ -1,10 +1,10 @@
-"""Service for querying detected AprilTags in the simulation."""
+"""Service for finding a given AprilTag id both with a real and sim Turtlebot"""
 
 import threading
 
 from apriltag_msgs.msg import AprilTagDetectionArray
 
-from apriltag_sim_interfaces.srv import FindTag
+from apriltag_find_interfaces.srv import FindTag
 
 from geometry_msgs.msg import TwistStamped
 
@@ -18,12 +18,12 @@ from rclpy.qos import QoSProfile
 ANGULAR_VELOCITY = 0.8
 
 
-class AprilTagSimService(Node):
+class AprilTagFindService(Node):
     """Check for visible tag and return its position and find status."""
 
     def __init__(self):
         """Initialise the AprilTag Detection Service."""
-        super().__init__('apriltag_sim_service')
+        super().__init__('apriltag_find_service')
         self._tag_frames = {
             f'tag36h11_{tag_id}': tag_id for tag_id in range(4)
         }
@@ -42,9 +42,9 @@ class AprilTagSimService(Node):
         )
 
         self.create_service(
-            FindTag, '/apriltag_sim_service/find_tag', self._srv_find_tag
+            FindTag, '/apriltag_find_service/find_tag', self._srv_find_tag
         )
-        self.get_logger().info('FindTag service ready: /find_tag')
+        self.get_logger().info('FindTag service ready: /apriltag_find_service/find_tag')
 
         # turtlebot cmd vel
         self.tb_cmdvel_pub = self.create_publisher(
@@ -94,7 +94,7 @@ class AprilTagSimService(Node):
             self.rate.sleep()
         # Tag found!
         self._stop_turtlebot()
-        self.get_logger().info(f'Found Tag {tag_id}', once=True)
+        self.get_logger().info(f'Found Tag {tag_id}', once=False)
 
     def _srv_find_tag(self, request, response):
         self._detected_tags.clear()
@@ -127,7 +127,7 @@ class AprilTagSimService(Node):
 def main(args=None):
     """Start the AprilTag service node."""
     rclpy.init(args=args)
-    node = AprilTagSimService()
+    node = AprilTagFindService()
 
     multi_thread_exec = MultiThreadedExecutor(num_threads=2)
     multi_thread_exec.add_node(node)

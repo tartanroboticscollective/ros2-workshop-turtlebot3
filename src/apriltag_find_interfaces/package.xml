@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>apriltag_sim_interfaces</name>
+  <name>apriltag_find_interfaces</name>
   <version>0.0.0</version>
   <description>Service interfaces for the AprilTag simulation.</description>
   <maintainer email="info@tartanrobotics.com">Tartan Robotics</maintainer>
