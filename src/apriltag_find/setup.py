@@ -1,8 +1,5 @@
 """Apriltag Sim package installation."""
 
-import os
-from glob import glob
-
 from setuptools import find_packages, setup
 
 package_name = 'apriltag_find'
@@ -31,7 +28,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'apriltag_find_service = ' 'apriltag_find.apriltag_find_service:main',
+            'apriltag_find_service = '
+            'apriltag_find.apriltag_find_service:main',
         ],
     },
 )

@@ -1,10 +1,10 @@
-"""Service for finding a given AprilTag id both with a real and sim Turtlebot"""
+"""Service to find a given AprilTag id both with a real and sim Turtlebot."""
 
 import threading
 
-from apriltag_msgs.msg import AprilTagDetectionArray
-
 from apriltag_find_interfaces.srv import FindTag
+
+from apriltag_msgs.msg import AprilTagDetectionArray
 
 from geometry_msgs.msg import TwistStamped
 
@@ -44,7 +44,9 @@ class AprilTagFindService(Node):
         self.create_service(
             FindTag, '/apriltag_find_service/find_tag', self._srv_find_tag
         )
-        self.get_logger().info('FindTag service ready: /apriltag_find_service/find_tag')
+        self.get_logger().info(
+            'FindTag service ready: /apriltag_find_service/find_tag'
+        )
 
         # turtlebot cmd vel
         self.tb_cmdvel_pub = self.create_publisher(
