@@ -130,12 +130,6 @@ case "${1:-}" in
         exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard --ros-args"
         ;;
 
-    # gazebo)
-    #     wait_for_container
-    #     echo "Starting TurtleBot3 Gazebo..."
-    #     exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
-    #     ;;
-
     rviz)
         wait_for_container
         echo "Starting RViz2..."
@@ -186,7 +180,7 @@ TELEOP_PANE=$(tmux split-window \
 RVIZ_PANE=$(tmux split-window \
     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
-GAZEBO_PANE=$(tmux split-window \
+EMPTY_PANE=$(tmux split-window \
     -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 
@@ -206,7 +200,7 @@ tmux send-keys -t "$ZENOH_PANE" \
 tmux send-keys -t "$RVIZ_PANE" \
     "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP rviz" C-m
 
-tmux send-keys -t "$GAZEBO_PANE" \
+tmux send-keys -t "$EMPTY_PANE" \
     "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP terminal" C-m
 
 
