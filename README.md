@@ -6,28 +6,20 @@
 
 <!-- HEADER -->
 <div align="center">
-  <h2 align="center">ROS 101 Crash Course Workshop - ROSCon UK 2026</h2>
+  
+  <h2 align="center">ROS 101 Crash Course - What's this all about?</h2>
 
   <a>
-    <img src="ROSConUK_2026_macro_banner.jpg" alt="header">
+    <img src="media/banner_ros101.png" alt="header">
   </a>
 
   <br />
 
-  <!-- <h2 align="center">ROS 101 Crash Course - What's this all about?</h2> -->
-
-  <p align="center">
-    Tartan Robotics Collective
-    <br />
-    Centre for AI in Assistive Autonomy, School of Informatics
-    <br />
-    The University of Edinburgh, United Kingdom
-  </p>
 </div>
 
 <!-- TABLE OF CONTENTS -->
 <!-- <details> -->
-  <summary>Overview and Setup</summary>
+  <summary><strong>Overview and Setup</strong></summary>
   <ul>
     <li>
       <a href="#about">About</a>
@@ -54,11 +46,17 @@
 
 ### Workshop Overview
 
-We are excited to welcome you to our hands-on workshop at ROSCon UK 2026, where we will explore TODO
+We are excited to welcome you to our hands-on workshop at ROSCon UK 2026, where we will explore:
 
-By the end of the workshop, you will:
+#### 🐢 ROS fundamentals with Turtlesim
+Get comfortable with the core concepts behind ROS nodes, topics, messages, services, commands and more.
+#### 🗺️ TurtleBot3 simulation, SLAM & navigation
+Move into simulation and learn how a mobile robot can map its environment and navigate autonomously.
+#### 🤖 Deploy to a real TurtleBot3 Burger
+Take what we’ve built in simulation and bring it into the real world.
+#### 📷 Camera + AprilTag search
+Put everything together by using the TurtleBot3’s camera to search for and detect AprilTags.
 
-- TODO
 
 We encourage you to actively participate, ask questions, and share your own insights. The workshop is also a space for discussion on how we can collectively improve and standardise simulation and control practices in ROS 2. 
 
@@ -76,7 +74,19 @@ We provide convenient setup scripts for your convenience.
 
 ### Setup Instructions (Start Here)
 
-The repository contains all the TODO that will be used during the workshop. Having it installed in advance will ensure you can follow each step, replicate demonstrations, and continue experimenting after the session.
+The repository contains all the scripts that will be used during the workshop.
+
+If you find difficult to install docker and tmux you can navigate under
+`scripts` and you will find the following helpers:
+
+Run:
+
+- `./get-docker.sh` to install docker on your system and remember to reboot! (ps: you will be asked to automatically reboot :))
+
+- `./install_tmux.sh` to install tmux on your machine.
+  - to finish setup tmux please copy or move the file `tmux.conf` under the Home directory with `cp tmux.conf ~/.tmux.conf`
+
+Having it installed in advance will ensure you can follow each step, replicate demonstrations, and continue experimenting after the session.
 
 ## Exercises
 
@@ -94,22 +104,13 @@ The repository contains all the TODO that will be used during the workshop. Havi
 
 [Apriltag Simulation Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/AprilTag%E2%80%90Simulation)
 
+![alt text](media/fast_spin_sim.gif "April Tag Simulation")
+
 ### 3: Real Turtlebot
 
 [Real Turtlebot Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/RealTurtlebot)
 
-### Simulated Turtlebot
-
-Run `./2_apriltagsim/dev_session.sh`
-
-type `export TURTLEBOT3_MODEL=burger_cam`
-
-type `rbuild`
-
-type `rsource`
-
-type `ros2 launch apriltag-sim apriltag_world.launch.xml`
-
+![alt text](media/tb_army.jpg "Turtlebots!")
 
 ---
 ## FAQ
@@ -119,3 +120,23 @@ In order to be able to run **graphical user interfaces** from inside the Docker 
 ```bash
 $ xhost +
 ```
+
+---
+<!-- FOOTER -->
+<div align="center">
+  <a>
+    <img src="media/ROSConUK_2026_macro_banner.jpg" alt="header">
+  </a>
+
+  <br />
+
+  <!-- <h2 align="center">ROS 101 Crash Course - What's this all about?</h2> -->
+
+  <p align="center">
+    Tartan Robotics Collective
+    <br />
+    Centre for AI in Assistive Autonomy, School of Informatics
+    <br />
+    The University of Edinburgh, United Kingdom
+  </p>
+</div>
