@@ -6,7 +6,7 @@
 
 <!-- HEADER -->
 <div align="center">
-  
+
   <h2 align="center">ROS 101 Crash Course - What's this all about?</h2>
 
   <a>
@@ -58,7 +58,7 @@ Take what we’ve built in simulation and bring it into the real world.
 Put everything together by using the TurtleBot3’s camera to search for and detect AprilTags.
 
 
-We encourage you to actively participate, ask questions, and share your own insights. The workshop is also a space for discussion on how we can collectively improve and standardise simulation and control practices in ROS 2. 
+We encourage you to actively participate, ask questions, and share your own insights. The workshop is also a space for discussion on how we can collectively improve and standardise simulation and control practices in ROS 2.
 
 ### Requirements
 
