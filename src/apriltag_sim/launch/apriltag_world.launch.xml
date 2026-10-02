@@ -43,5 +43,5 @@
     <param from="$(find-pkg-share apriltag_sim)/config/apriltag_36h11_sim.yaml"/>
   </node>
 
-  <node pkg="apriltag_sim" exec="apriltag_sim_service" name="apriltag_sim_service" output="screen"/>
+  <node pkg="apriltag_find" exec="apriltag_find_service" name="apriltag_find_service" output="screen"/>
 </launch>
