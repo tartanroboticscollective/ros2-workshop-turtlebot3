@@ -1,0 +1,27 @@
+{
+  mode: "peer",
+
+  connect: {
+    endpoints: [
+      "tcp/127.0.0.1:7447"
+    ]
+  },
+
+  listen: {
+    endpoints: [
+      "tcp/0.0.0.0:0"
+    ]
+  },
+
+  scouting: {
+    multicast: {
+      enabled: false
+    }
+  },
+
+  transport: {
+    link: {
+      protocols: ["tcp"]
+    }
+  }
+}

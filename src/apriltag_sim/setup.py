@@ -5,7 +5,7 @@ from glob import glob
 
 from setuptools import find_packages, setup
 
-package_name = 'apriltag-sim'
+package_name = 'apriltag_sim'
 
 apriltag_model_files = [
     path for path in glob('models/apriltag-box/*') if os.path.isfile(path)
@@ -89,6 +89,8 @@ setup(
         ],
     },
     entry_points={
-        'console_scripts': [],
+        'console_scripts': [
+            'apriltag_sim_service = ' 'apriltag_sim.apriltag_sim_service:main',
+        ],
     },
 )

@@ -5,6 +5,7 @@
 
 BASH_CMD="ros2 run rmw_zenoh_cpp rmw_zenohd"
 TURTLEBOT3_MODEL=burger_cam
+ZENOH_CONFIG_JOIN_OVERRIDE=""
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
@@ -16,6 +17,7 @@ Usage: dev.sh [-b|bash] [-m|--model] turtlebot3_model [-h|--help]
 
 Where:
     -b | bash       Open bash in docker container (Default in dev.sh)
+    -j (Opt: ip)    Override Zenoh default config to connect to remote router
     -m | --model    Set turtlebot3 model (e.g. "burger_cam" or "waffle_pi")
     -h | --help     Show this help message
     "
@@ -27,6 +29,14 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -b|bash)
             BASH_CMD=bash
+            ;;
+        -j)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/'"$2"':7447"]'
+                shift
+            else
+                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.0.194:7447"]'
+            fi
             ;;
         -m|--model)
             if [[ -n "$2" && "$2" != -* ]]; then
@@ -68,10 +78,14 @@ docker run -it --rm --net host --privileged \
     -e XAUTHORITY="${XAUTHORITY}" \
     -e XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     -e TURTLEBOT3_MODEL="$TURTLEBOT3_MODEL" \
+    -e ZENOH_ROUTER_CONFIG_URI="/turtlebot_ws/zenoh/ROUTER_CONFIG.json5" \
+    -e ZENOH_SESSION_CONFIG_URI="/turtlebot_ws/zenoh/SESSION_CONFIG.json5" \
+    -e ZENOH_CONFIG_OVERRIDE="$ZENOH_CONFIG_JOIN_OVERRIDE" \
     -v /dev:/dev \
     -v /tmp:/tmp \
     -v /etc/localtime:/etc/localtime:ro \
     -v $WS_PATH/config/default.rviz:/home/developer/.rviz2/default.rviz \
     -v $WS_PATH/maps:/turtlebot_ws/maps \
     -v $WS_PATH/src:/turtlebot_ws/src \
+    -v $WS_PATH/zenoh:/turtlebot_ws/zenoh \
     ros2-workshop-turtlebot3:latest-dev $BASH_CMD

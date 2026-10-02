@@ -52,7 +52,7 @@ case "${1:-}" in
 
     zenoh)
         echo "Running run.sh..."
-        $WS_PATH/docker/run.sh
+        $WS_PATH/docker/run.sh -j
         ;;
 
     teleop)
