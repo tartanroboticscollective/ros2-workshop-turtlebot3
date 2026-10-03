@@ -52,7 +52,7 @@ We are excited to welcome you to our hands-on workshop at ROSCon UK 2026, where 
 Get comfortable with the core concepts behind ROS nodes, topics, messages, services, commands and more.
 #### 🗺️ TurtleBot3 simulation, SLAM & navigation
 Move into simulation and learn how a mobile robot can map its environment and navigate autonomously.
-#### 🤖 Deploy to a real TurtleBot3 Burger
+#### 🤖 Deploy to a real TurtleBot3 Burger or Waffle
 Take what we’ve built in simulation and bring it into the real world.
 #### 📷 Camera + AprilTag search
 Put everything together by using the TurtleBot3’s camera to search for and detect AprilTags.
