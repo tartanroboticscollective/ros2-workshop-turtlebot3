@@ -82,7 +82,7 @@ git clone https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3.g
 Unless you have Tmux and Docker manually installed, we provide convenient setup scripts to install both (For Ubuntu):
 
 - [Tmux setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/TmuxSetup)
-- [Docker setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/DockerSetup) 
+- [Docker setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/DockerSetup)
 
 **Warning:** Tested only on Ubuntu
 
