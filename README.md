@@ -22,10 +22,10 @@
   <summary><strong>Overview and Setup</strong></summary>
   <ul>
     <li>
-      <a href="#about">About</a>
+      <a href="#workshop-overview">Workshop Overview</a>
+      <li><a href="#requirements">Requirements</a></li>
       <ul>
-        <li><a href="#workshop-overview">Workshop Overview</a></li>
-        <li><a href="#setup-instructions-(start-here)">Setup Instructions (Start Here)</a></li>
+        <li><a href="#setup-instructions">Setup Instructions</a></li>
       </ul>
     </li>
   </ul>
@@ -60,53 +60,88 @@ Put everything together by using the TurtleBot3’s camera to search for and det
 
 We encourage you to actively participate, ask questions, and share your own insights. The workshop is also a space for discussion on how we can collectively improve and standardise simulation and control practices in ROS 2.
 
-### Requirements
+---
+
+## Requirements
 
 - Ubuntu laptop
-- Docker
-- Tmux
+- [Tmux](https://tmux.app/#install)
+- [Docker](https://docs.docker.com/desktop/#next-steps)
 
-We use [Docker](https://www.docker.com/) and [Tmux](https://tmux.app/) to provide this workshop.
+Please ensure you have a working Linux laptop with both Tmux and Docker installed (Tested on Ubuntu).
 
-We provide convenient setup scripts for your convenience.
-[Docker setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/DockerSetup)
-[Tmux setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/TmuxSetup)
+If possible, please clone this repository and run one of our scripts to ensure you have pulled the docker image before you arrive!
 
-### Setup Instructions (Start Here)
+### Setup Instructions
 
-The repository contains all the scripts that will be used during the workshop.
+First of all, please clone this repository locally on your machine:
+```bash
+git clone https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3.git
+```
 
-If you find difficult to install docker and tmux you can navigate under
-`scripts` and you will find the following helpers:
+Unless you have Tmux and Docker manually installed, we provide convenient setup scripts to install both (For Ubuntu):
 
-Run:
+- [Tmux setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/TmuxSetup)
+- [Docker setup](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/DockerSetup) 
 
-- `./get-docker.sh` to install docker on your system and remember to reboot! (ps: you will be asked to automatically reboot :))
+**Warning:** Tested only on Ubuntu
 
-- `./install_tmux.sh` to install tmux on your machine.
-  - to finish setup tmux please copy or move the file `tmux.conf` under the Home directory with `cp tmux.conf ~/.tmux.conf`
+Please follow the instructions above to setup Docker and Tmux automagically.
 
-Having it installed in advance will ensure you can follow each step, replicate demonstrations, and continue experimenting after the session.
+<u>Having both tools installed before the workshop will ensure you can follow along without issues.</u>
 
-## Exercises
+### Am I ready for the workshop now?
 
-### 0: Introduction
+Yes! Maybe! Let's find out!
+
+Once you have a Linux (Ubuntu) laptop with both Docker and Tmux setup (with our without our magic scripts), navigate to the main repository folder:
+```bash
+cd ros2-workshop-turtlebot3
+```
+
+And run this script:
+```bash
+./0_intro/start_2dteleop.sh
+```
+
+Multiple things should happen, don't panic!
+
+The script:
+
+- Opens a series of panels using Tmux
+- Pulls and runs the latest version of our Docker image (Which includes everything required for this workshop)
+- Runs TurtleSim, a 2D simulator of a turtle robot!
+
+If you see something like this, congratulations! You are ready to go!
+![alt text](media/ROS101_2dturtlesim.png "2D Turtlesim")
+
+If not, don't worry. We will help you fix any issues at the start of the workshop.
+
+If you do have time and want to breeze through the workshop material, feel free to get familiarised with the repository, Docker, and Tmux.
+
+**If and only if** you used our Tmux setup script, you will also have an enhanced Tmux configuration enabling mouse support, and you will be able to use these short-cuts:
+
+![alt text](media/tmux_cheatsheet_ROS101.jpg "Tmux Cheat Sheet")
+
+## Tutorials
+
+### 0: Introduction + 2D Turtlesim (ROS2 Basics, Tmux, Docker, Teleoperation)
 
 [Introduction to ROS2](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Introduction)
 
-### 1: Simulation
+### 1: 3D Simulation with Gazebo (Localisation, Mapping, Navigation)
 
 [Simulation Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Simulation)
 
 ![alt text](media/test_2.gif "3D Sim Teleop")
 
-### 2: Apriltag Simulation
+### 2: Apriltag Simulation with Gazebo (Camera, Apriltag)
 
 [Apriltag Simulation Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/AprilTag%E2%80%90Simulation)
 
 ![alt text](media/fast_spin_sim.gif "April Tag Simulation")
 
-### 3: Real Turtlebot
+### 3: Real Turtlebot (Everything!)
 
 [Real Turtlebot Tutorial](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/RealTurtlebot)
 
