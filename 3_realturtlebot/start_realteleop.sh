@@ -183,6 +183,8 @@ RVIZ_PANE=$(tmux split-window \
 EMPTY_PANE=$(tmux split-window \
     -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
+# Prevent bash commands being sent before tmux panes are setup correctly
+sleep 1
 
 # ================================================================
 # Start pane processes
@@ -203,6 +205,20 @@ tmux send-keys -t "$RVIZ_PANE" \
 tmux send-keys -t "$EMPTY_PANE" \
     "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP terminal" C-m
 
+# =============================================================================
+# Display pane titles in pane borders
+# =============================================================================
+
+tmux select-pane -t "$MAIN_PANE"  -T "Terminal - Type here"
+tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Main Docker (Ctrl+C here to kill everything)"
+tmux select-pane -t "$TELEOP_PANE"  -T "Keyboard Teleoperate"
+tmux select-pane -t "$RVIZ_PANE"  -T "RViz - ROS Data Visualiser"
+tmux select-pane -t "$EMPTY_PANE"  -T "Terminal - Type here"
+
+tmux set-option -t "$SESSION_NAME" pane-border-status top
+
+tmux set-option -t "$SESSION_NAME" pane-border-format \
+    " #{pane_title} "
 
 # Start with keyboard focus on Teleop.
 tmux select-pane -t "$TELEOP_PANE"
