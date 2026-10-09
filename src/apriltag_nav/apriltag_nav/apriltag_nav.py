@@ -4,11 +4,13 @@ import math
 
 from apriltag_find_interfaces.srv import FindTag
 
+from action_msgs.msg import GoalStatus
 from nav2_msgs.action import NavigateToPose
 
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
+from rclpy.action import ActionClient
 
 from tf2_ros import Buffer, TransformException, TransformListener
 
@@ -24,8 +26,18 @@ class AprilTagNav(Node):
         self.find_client = self.create_client(
             FindTag, '/apriltag_find_service/find_tag'
         )
+        self.nav_client =ActionClient(self, NavigateToPose, '/navigate_to_pose')
+        self.nav_goal = None
+        self.nav_goal_check = None
 
-    def _navigation_goal(self, tag_tf):
+    def _wait_action(self, action):
+        while rclpy.ok() and not action.done():
+            rclpy.spin_until_future_complete(self, action, timeout_sec=0.1)
+        if not action.done():
+            raise RuntimeError('Killd while processing action')
+        return action.result()
+
+    def _navigation_goal(self, tag_id, tag_tf):
         try:
             robot = self.tf_buffer.lookup_transform(
                 tag_tf.header.frame_id, 'base_footprint', Time()
@@ -52,12 +64,36 @@ class AprilTagNav(Node):
         yaw = math.atan2(dy, dx)
         goal.pose.pose.orientation.z = math.sin(yaw / 2.0)
         goal.pose.pose.orientation.w = math.cos(yaw / 2.0)
-        self.get_logger().warning(f'Navigation goal: {goal}')
+
+        self.nav_goal = self.nav_client.send_goal_async(goal)
+
+        self.nav_goal_check = self._wait_action(self.nav_goal)
+        if not self.nav_goal_check.accepted:
+            self.get_logger().error("Nav2 reject goal")
+            self.nav_goal_check = None
+            return False
+
+        nav_result = self.nav_goal_check.get_result_async()
+        result = self._wait_action(nav_result)
+        self.nav_goal_check = None
+
+        if result.status != GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().error(
+                f'Navigation failed (status {result.status}): '
+                f'{result.result.error_msg}'
+            )
+            return False
+
+        self.get_logger().info(f'!! Reached tag {tag_id} !!')
         return True
 
     def navigate(self):
         if not self.find_client.wait_for_service(timeout_sec=10.0):
             self.get_logger().error('AprilTag find service is unavailable')
+            return False
+
+        if not self.nav_client.wait_for_server(timeout_sec=10.0):
+            self.get_logger().error('Nav2 navigate_to_pose action is unavailable')
             return False
 
         tag_id = self.get_parameter('tag_id').value
@@ -75,9 +111,9 @@ class AprilTagNav(Node):
             self.get_logger().error(f'Tag {tag_id} was not found')
             return False
 
-        tag = response.tag_transform
+        tag_tf = response.tag_transform
 
-        return self._navigation_goal(tag)
+        return self._navigation_goal(tag_id,tag_tf)
 
 
 def main(args=None):
