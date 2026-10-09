@@ -116,6 +116,8 @@ RQT_PANE=$(tmux split-window \
 TURTLESIM_PANE=$(tmux split-window \
     -h -t "$RQT_PANE" -l '50%' -P -F '#{pane_id}')
 
+# Prevent bash commands being sent before tmux panes are setup correctly
+sleep 1
 
 # ================================================================
 # Start pane processes
@@ -136,6 +138,20 @@ tmux send-keys -t "$RQT_PANE" \
 tmux send-keys -t "$TURTLESIM_PANE" \
     "bash '$SCRIPT_PATH' turtlesim" C-m
 
+# =============================================================================
+# Display pane titles in pane borders
+# =============================================================================
+
+tmux select-pane -t "$MAIN_PANE"  -T "Terminal - Type here"
+tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Main Docker (Ctrl+C here to kill everything)"
+tmux select-pane -t "$TELEOP_PANE"  -T "Keyboard Teleoperate"
+tmux select-pane -t "$RQT_PANE"  -T "rqt_graph"
+tmux select-pane -t "$TURTLESIM_PANE"  -T "2D Turtlesim"
+
+tmux set-option -t "$SESSION_NAME" pane-border-status top
+
+tmux set-option -t "$SESSION_NAME" pane-border-format \
+    " #{pane_title} "
 
 # Start with keyboard focus on Teleop.
 tmux select-pane -t "$TELEOP_PANE"

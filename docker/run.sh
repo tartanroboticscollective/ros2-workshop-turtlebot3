@@ -35,7 +35,7 @@ while [[ "$#" -gt 0 ]]; do
                 ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/'"$2"':7447"]'
                 shift
             else
-                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.0.194:7447"]'
+                ZENOH_CONFIG_JOIN_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.1.3:7447"]'
             fi
             ;;
         -m|--model)
