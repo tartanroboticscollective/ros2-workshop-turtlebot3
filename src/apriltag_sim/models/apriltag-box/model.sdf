@@ -9,7 +9,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
+            <uri>model://apriltag-box/meshes/walls/wallsv2.obj</uri>
           </mesh>
         </geometry>
       </collision>
@@ -18,7 +18,7 @@
         <cast_shadows>false</cast_shadows>
         <geometry>
           <mesh>
-            <uri>model://apriltag-box/meshes/walls/walls.obj</uri>
+            <uri>model://apriltag-box/meshes/walls/wallsv2.obj</uri>
           </mesh>
         </geometry>
       </visual>
@@ -27,7 +27,7 @@
         <cast_shadows>false</cast_shadows>
         <geometry>
           <mesh>
-            <uri>model://apriltag-box/meshes/tags/tags.obj</uri>
+            <uri>model://apriltag-box/meshes/tags/tagsv2.obj</uri>
           </mesh>
         </geometry>
       </visual>
