@@ -11,9 +11,13 @@ from geometry_msgs.msg import TwistStamped
 import rclpy
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.clock import Clock
+from rclpy.duration import Duration
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
+from rclpy.time import Time
+
+from tf2_ros import Buffer, TransformException, TransformListener
 
 ANGULAR_VELOCITY = 0.8
 
@@ -24,9 +28,8 @@ class AprilTagFindService(Node):
     def __init__(self):
         """Initialise the AprilTag Detection Service."""
         super().__init__('apriltag_find_service')
-        self._tag_frames = {
-            f'tag36h11_{tag_id}': tag_id for tag_id in range(4)
-        }
+        self._tf_buffer = Buffer(node=self)
+        self._tf_listener = TransformListener(self._tf_buffer, self)
 
         # for Apriltag detection topic
         self._detected_tags = {}
@@ -116,13 +119,22 @@ class AprilTagFindService(Node):
         )
         self.tb_search_thread.start()
         self.tb_search_thread.join()
-        # Service Output
-        position = self._detected_tags.get(tag_id)
+        try:
+            response.tag_transform = self._tf_buffer.lookup_transform(
+                'map',
+                f'tag36h11_{tag_id}',
+                Time(),
+                timeout=Duration(seconds=1.0),
+            )
+        except TransformException as error:
+            self.get_logger().warn(
+                f'Cannot get map transform for tag {tag_id}: {error}'
+            )
+            response.found = False
+            return response
 
+        response.tag_position = response.tag_transform.transform.translation
         response.found = True
-        if response.found:
-            response.tag_position.x = position[0]
-            response.tag_position.y = position[1]
         return response
 
 

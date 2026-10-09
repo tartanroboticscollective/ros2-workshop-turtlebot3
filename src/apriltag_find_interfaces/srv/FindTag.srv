@@ -1,4 +1,5 @@
 int32 tag_id  # Valid tag IDs are 0 through 3.
 ---
 bool found
-geometry_msgs/Vector3 tag_position  # Position in the tag transform's parent frame, in meters.
+geometry_msgs/Vector3 tag_position  # Position in the map frame, in meters.
+geometry_msgs/TransformStamped tag_transform  # Transform from map to tag36h11_<id>.
