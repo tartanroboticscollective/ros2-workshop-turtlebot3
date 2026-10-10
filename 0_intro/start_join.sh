@@ -37,6 +37,15 @@ exec_in_container() {
     docker exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
+WAIT_AND_SET_TOP_CMD='
+wait_and_set_top() {
+    local title="$1"
+    while ! wmctrl -l | grep -q "$title"; do
+        sleep 1
+    done
+    wmctrl -r "$title" -b add,above
+}
+'
 
 # ================================================================
 # Commands run by individual panes
@@ -47,7 +56,8 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"rqt_graph\""
+        exec_in_container "clear && bash"
         ;;
 
     zenoh)

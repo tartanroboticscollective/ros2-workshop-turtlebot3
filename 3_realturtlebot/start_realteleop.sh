@@ -106,6 +106,15 @@ exec_in_container() {
     docker exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
+WAIT_AND_SET_TOP_CMD='
+wait_and_set_top() {
+    local title="$1"
+    while ! wmctrl -l | grep -q "$title"; do
+        sleep 1
+    done
+    wmctrl -r "$title" -b add,above
+}
+'
 
 # ================================================================
 # Commands run by individual panes
@@ -116,7 +125,9 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"RViz\""
+        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"rqt_graph\""
+        exec_in_container "clear && bash"
         ;;
 
     zenoh)
@@ -134,6 +145,12 @@ case "${1:-}" in
         wait_for_container
         echo "Starting RViz2..."
         exec_in_container "ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true"
+        ;;
+
+    rqt_graph)
+        wait_for_container
+        echo "Starting rqt_graph..."
+        exec_in_container "rqt_graph"
         ;;
 
     "")
@@ -156,7 +173,7 @@ esac
 # │          Main terminal           │     Teleop      │
 # │                                  │                 │
 # ├──────────────────┬───────────────┼─────────────────┤
-# │      Zenoh       │     RViz2     │     EMPTY       │
+# │      Zenoh       │     RViz2     │    rqt_graph    │
 # └──────────────────┴───────────────┴─────────────────┘
 # ================================================================
 
@@ -176,11 +193,11 @@ ZENOH_PANE=$(tmux split-window \
 TELEOP_PANE=$(tmux split-window \
     -h -t "$MAIN_PANE" -l '33%' -P -F '#{pane_id}')
 
-# Zenoh / RViz2 / EMPTY
+# Zenoh / RViz2 / rqt_graph
 RVIZ_PANE=$(tmux split-window \
     -h -t "$ZENOH_PANE" -l '66%' -P -F '#{pane_id}')
 
-EMPTY_PANE=$(tmux split-window \
+RQT_GRAPH=$(tmux split-window \
     -h -t "$RVIZ_PANE" -l '50%' -P -F '#{pane_id}')
 
 # Prevent bash commands being sent before tmux panes are setup correctly
@@ -202,8 +219,8 @@ tmux send-keys -t "$ZENOH_PANE" \
 tmux send-keys -t "$RVIZ_PANE" \
     "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP rviz" C-m
 
-tmux send-keys -t "$EMPTY_PANE" \
-    "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP terminal" C-m
+tmux send-keys -t "$RQT_GRAPH" \
+    "bash '$SCRIPT_PATH' -ip $TURTLEBOT3_IP rqt_graph" C-m
 
 # =============================================================================
 # Display pane titles in pane borders
@@ -213,7 +230,7 @@ tmux select-pane -t "$MAIN_PANE"  -T "Terminal - Type here"
 tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Main Docker (Ctrl+C here to kill everything)"
 tmux select-pane -t "$TELEOP_PANE"  -T "Keyboard Teleoperate"
 tmux select-pane -t "$RVIZ_PANE"  -T "RViz - ROS Data Visualiser"
-tmux select-pane -t "$EMPTY_PANE"  -T "Terminal - Type here"
+tmux select-pane -t "$RQT_GRAPH"  -T "rqt_graph"
 
 tmux set-option -t "$SESSION_NAME" pane-border-status top
 
