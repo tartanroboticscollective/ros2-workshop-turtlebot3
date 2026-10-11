@@ -69,6 +69,15 @@ exec_in_container() {
     docker exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
+WAIT_AND_SET_TOP_CMD='
+wait_and_set_top() {
+    local title="$1"
+    while ! wmctrl -l | grep -q "$title"; do
+        sleep 1
+    done
+    wmctrl -r "$title" -b add,above
+}
+'
 
 # ================================================================
 # Commands run by individual panes
@@ -79,7 +88,9 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec docker exec -it "$CONTAINER_NAME" /bin/bash
+        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"Gazebo\""
+        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"RViz\""
+        exec_in_container "clear && bash"
         ;;
 
     zenoh)
@@ -152,6 +163,8 @@ CARTOGRAPHER_PANE=$(tmux split-window \
 GAZEBO_PANE=$(tmux split-window \
     -h -t "$CARTOGRAPHER_PANE" -l '50%' -P -F '#{pane_id}')
 
+# Prevent bash commands being sent before tmux panes are setup correctly
+sleep 1
 
 # ================================================================
 # Start pane processes
@@ -173,6 +186,20 @@ tmux send-keys -t "$CARTOGRAPHER_PANE" \
 tmux send-keys -t "$GAZEBO_PANE" \
     "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL gazebo" C-m
 
+# =============================================================================
+# Display pane titles in pane borders
+# =============================================================================
+
+tmux select-pane -t "$MAIN_PANE"  -T "Terminal - Save the map here!"
+tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Main Docker (Ctrl+C here to kill everything)"
+tmux select-pane -t "$TELEOP_PANE"  -T "Keyboard Teleoperate"
+tmux select-pane -t "$CARTOGRAPHER_PANE"  -T "Cartographer - Creates the map"
+tmux select-pane -t "$GAZEBO_PANE"  -T "Gazebo - 3D Simulator"
+
+tmux set-option -t "$SESSION_NAME" pane-border-status top
+
+tmux set-option -t "$SESSION_NAME" pane-border-format \
+    " #{pane_title} "
 
 # Start with keyboard focus on Teleop.
 tmux select-pane -t "$TELEOP_PANE"
