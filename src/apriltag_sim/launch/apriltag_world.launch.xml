@@ -46,5 +46,4 @@
   <node pkg="apriltag_find" exec="apriltag_find_service" name="apriltag_find_service" output="screen"/>
 
   <!-- Apriltag Navigation -->
-   
 </launch>
