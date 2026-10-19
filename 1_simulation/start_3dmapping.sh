@@ -69,6 +69,12 @@ exec_in_container() {
     docker exec -it "$CONTAINER_NAME" bash -ic "$1"
 }
 
+# Non-interactive variant: no TTY, no stdin. Used for background helpers
+# that must not consume keystrokes typed into the pane.
+exec_in_container_noninteractive() {
+    docker exec "$CONTAINER_NAME" bash -c "$1" </dev/null
+}
+
 WAIT_AND_SET_TOP_CMD='
 wait_and_set_top() {
     local title="$1"
@@ -79,6 +85,9 @@ wait_and_set_top() {
 }
 '
 
+# Command pre-typed (but not executed) in the main terminal pane
+MAP_SAVE_CMD="ros2 run nav2_map_server map_saver_cli -f /turtlebot_ws/maps/map"
+
 # ================================================================
 # Commands run by individual panes
 # ================================================================
@@ -88,32 +97,45 @@ case "${1:-}" in
     terminal)
         wait_for_container
         echo "Opening shell in $CONTAINER_NAME..."
-        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"Gazebo\""
-        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"RViz\""
+        exec_in_container_noninteractive "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"Gazebo\""
+        exec_in_container_noninteractive "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"RViz\""
+
+        # Pre-type the map-saving command once the container shell is up.
+        # -l sends the text literally; no Enter (C-m) is sent, so the user
+        # presses Enter when ready.
+        if [[ -n "${TMUX_PANE:-}" ]]; then
+            ( sleep 2; tmux send-keys -t "$TMUX_PANE" -l "$MAP_SAVE_CMD" ) &
+        fi
+
         exec_in_container "clear && bash"
+        exit 0
         ;;
 
     zenoh)
         echo "Running run.sh..."
-        $WS_PATH/docker/run.sh -m $TURTLEBOT3_MODEL
+        "$WS_PATH/docker/run.sh" -m "$TURTLEBOT3_MODEL"
+        exit 0
         ;;
 
     teleop)
         wait_for_container
         echo "Starting TurtleBot3 teleop..."
         exec_in_container "ros2 run turtlebot3_teleop teleop_keyboard"
+        exit 0
         ;;
 
     gazebo)
         wait_for_container
         echo "Starting TurtleBot3 Gazebo..."
         exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+        exit 0
         ;;
 
     cartographer)
         wait_for_container
         echo "Starting Cartographer..."
         exec_in_container "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True"
+        exit 0
         ;;
 
     "")
@@ -171,8 +193,7 @@ sleep 1
 # ================================================================
 
 tmux send-keys -t "$MAIN_PANE" \
-    "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL terminal" C-m \
-    "ros2 run nav2_map_server map_saver_cli -f /turtlebot_ws/maps/map"
+    "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL terminal" C-m
 
 tmux send-keys -t "$TELEOP_PANE" \
     "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL teleop" C-m
