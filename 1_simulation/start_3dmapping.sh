@@ -139,6 +139,9 @@ case "${1:-}" in
     gazebo)
         wait_for_zenoh
         echo "Starting TurtleBot3 Gazebo..."
+        # gz sim survives the SIGHUP sent when the tmux session is killed,
+        # so take down this pane's whole process group on exit
+        trap 'kill -TERM -- -$$' EXIT
         run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         exit 0
         ;;
@@ -146,7 +149,7 @@ case "${1:-}" in
     cartographer)
         wait_for_zenoh
         echo "Starting Cartographer..."
-        run_in_pixi "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True"
+        run_in_pixi "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True cartographer_config_dir:=\$CARTOGRAPHER_CONFIG_DIR"
         exit 0
         ;;
 

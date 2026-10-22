@@ -39,6 +39,8 @@ ros-jazzy-foxglove-bridge = "*"
 # Turtlebot 3 pc setup
 ros-jazzy-cartographer = "*"
 ros-jazzy-cartographer-ros = "*"
+# Patched build of the package behind the ros-jazzy-cartographer-ros metapackage
+ros2-cartographer-ros = { path = "pixi/cartographer_ros" }
 ros-jazzy-navigation2 = "*"
 ros-jazzy-nav2-bringup = "*"
 # Perception + Apriltags

@@ -125,6 +125,9 @@ case "${1:-}" in
     gazebo)
         wait_for_zenoh
         echo "Starting TurtleBot3 Gazebo..."
+        # gz sim survives the SIGHUP sent when the tmux session is killed,
+        # so take down this pane's whole process group on exit
+        trap 'kill -TERM -- -$$' EXIT
         run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         ;;
 

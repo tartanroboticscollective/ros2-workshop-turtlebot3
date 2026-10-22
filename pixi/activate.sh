@@ -13,6 +13,15 @@ export GZ_IP="${GZ_IP:-127.0.0.1}"
 
 export TURTLEBOT3_MODEL="${TURTLEBOT3_MODEL:-burger_cam}"
 
+# conda-forge's cartographer can't find its own configuration_files (conda's
+# prefix replacement leaves NULs in the built-in path), so put them next to
+# the TurtleBot3 config, in the directory cartographer searches first
+export CARTOGRAPHER_CONFIG_DIR="$CONDA_PREFIX/share/workshop_cartographer_config"
+mkdir -p "$CARTOGRAPHER_CONFIG_DIR"
+ln -sf "$CONDA_PREFIX"/share/cartographer/configuration_files/*.lua \
+    "$CONDA_PREFIX"/share/turtlebot3_cartographer/config/*.lua \
+    "$CARTOGRAPHER_CONFIG_DIR"/
+
 # Workshop packages, once built with `pixi run build`
 if [ -f "$PIXI_PROJECT_ROOT/install/setup.sh" ]; then
     . "$PIXI_PROJECT_ROOT/install/setup.sh"
