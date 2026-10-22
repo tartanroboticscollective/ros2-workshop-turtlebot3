@@ -37,47 +37,63 @@ while [[ "$#" -gt 0 ]]; do
     break
 done
 
+# Read by the TurtleBot3 launch files in every pane
+export TURTLEBOT3_MODEL
+
 SESSION_NAME="ros2-workshop"
-CONTAINER_NAME="ros2-workshop-turtlebot3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
 # ================================================================
-# Docker helpers
+# Pixi helpers
 # ================================================================
 
-wait_for_container() {
-    echo "Waiting for container '$CONTAINER_NAME' to be running..."
+wait_for_zenoh() {
+    echo "Waiting for the Zenoh router to be running..."
 
-    while true; do
-        if docker ps \
-            --filter "name=^${CONTAINER_NAME}$" \
-            --filter "status=running" \
-            --format '{{.Names}}' |
-        grep -qx "$CONTAINER_NAME"
-        then
-            echo "Container '$CONTAINER_NAME' is running."
-            return 0
-        fi
-
+    # Wait for the router port (see zenoh/ROUTER_CONFIG.json5) to accept connections
+    while ! (echo >/dev/tcp/127.0.0.1/7447) 2>/dev/null; do
         sleep 1
     done
+
+    echo "Zenoh router is running."
 }
 
-exec_in_container() {
-    docker exec -it "$CONTAINER_NAME" bash -ic "$1"
+run_in_pixi() {
+    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
 }
 
-WAIT_AND_SET_TOP_CMD='
+open_pixi_shell() {
+    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
+}
+
+# Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
 wait_and_set_top() {
     local title="$1"
+    [[ -n "${SKIP_SET_TOP:-}" ]] && return 0
+    if [[ "$(uname)" == "Darwin" ]]; then
+        local result
+        while true; do
+            result=$(osascript "$WS_PATH/setup/raise_window.applescript" "$title" 2>&1)
+            case "$result" in
+                raised) return 0 ;;
+                *"assistive access"*)
+                    echo "To bring GUI windows to the front, allow your terminal app in"
+                    echo "System Settings > Privacy & Security > Accessibility."
+                    SKIP_SET_TOP=1
+                    return 0
+                    ;;
+            esac
+            sleep 1
+        done
+    fi
+    command -v wmctrl >/dev/null || return 0
     while ! wmctrl -l | grep -q "$title"; do
         sleep 1
     done
     wmctrl -r "$title" -b add,above
 }
-'
 
 # ================================================================
 # Commands run by individual panes
@@ -86,28 +102,30 @@ wait_and_set_top() {
 case "${1:-}" in
 
     terminal)
-        wait_for_container
-        echo "Opening shell in $CONTAINER_NAME..."
-        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"Gazebo\""
-        exec_in_container "${WAIT_AND_SET_TOP_CMD} wait_and_set_top \"RViz\""
-        exec_in_container "clear && bash"
+        wait_for_zenoh
+        clear
+        echo "Opening shell in the pixi environment..."
+        wait_and_set_top "Gazebo"
+        wait_and_set_top "RViz"
+        open_pixi_shell
         ;;
 
     zenoh)
-        echo "Running run.sh..."
-        $WS_PATH/docker/run.sh -m $TURTLEBOT3_MODEL
+        echo "Starting Zenoh router..."
+        pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+        tmux kill-session -t "$SESSION_NAME"
         ;;
 
     navigation)
-        wait_for_container
+        wait_for_zenoh
         echo "Starting TurtleBot3 navigation..."
-        exec_in_container "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=/turtlebot_ws/maps/map.yaml use_sim_time:=True"
+        run_in_pixi "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:='$WS_PATH/maps/map.yaml' use_sim_time:=True"
         ;;
 
     gazebo)
-        wait_for_container
+        wait_for_zenoh
         echo "Starting TurtleBot3 Gazebo..."
-        exec_in_container "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+        run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
         ;;
 
     "")
@@ -137,6 +155,9 @@ esac
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     exec tmux attach-session -t "$SESSION_NAME"
 fi
+
+# Install the pixi environment before starting any panes
+pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 
@@ -186,7 +207,7 @@ tmux send-keys -t "$GAZEBO_PANE" \
 # =============================================================================
 
 tmux select-pane -t "$MAIN_PANE"  -T "Terminal - Save the map here!"
-tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Main Docker (Ctrl+C here to kill everything)"
+tmux select-pane -t "$ZENOH_PANE"  -T "Zenoh - Router (Ctrl+C here to kill everything)"
 tmux select-pane -t "$TELEOP_PANE"  -T "Keyboard Teleoperate"
 tmux select-pane -t "$NAVIGATION_PANE"  -T "Navigation - Controls the Turtlebot"
 tmux select-pane -t "$GAZEBO_PANE"  -T "Gazebo - 3D Simulator"

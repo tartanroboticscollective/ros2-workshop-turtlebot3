@@ -1,0 +1,58 @@
+[workspace]
+name = "ros2-workshop-turtlebot3"
+description = "ROS 2 Turtlebot 3 Jazzy workshop environment"
+channels = ["https://prefix.dev/robostack-jazzy", "https://prefix.dev/conda-forge"]
+platforms = [
+    "linux-64",
+    "linux-aarch64",
+    { name = "osx-arm64-macos-14", platform = "osx-arm64", macos = "14.0" },
+]
+preview = ["pixi-build"]
+
+[dependencies]
+# Core dependencies
+ros-jazzy-desktop = "*"
+colcon-common-extensions = "*"
+# Newer versions break `colcon build --symlink-install` for ament_python packages
+setuptools = "<80"
+# Build tools for ament_cmake packages (apriltag_find_interfaces)
+compilers = "*"
+cmake = "<4"
+ninja = "*"
+pkg-config = "*"
+# Dev tools
+bash = "*"
+tmux = "*"
+# ROS dependencies
+ros-jazzy-compressed-image-transport = "*"
+ros-jazzy-compressed-depth-image-transport = "*"
+ros-jazzy-image-transport = "*"
+ros-jazzy-point-cloud-transport = "*"
+ros-jazzy-point-cloud-transport-plugins = "*"
+ros-jazzy-rmw-zenoh-cpp = "*"
+# ROS tools
+ros-jazzy-rqt-common-plugins = "*"
+ros-jazzy-rqt-robot-steering = "*"
+ros-jazzy-rqt-tf-tree = "*"
+ros-jazzy-rviz2 = "*"
+ros-jazzy-foxglove-bridge = "*"
+# Turtlebot 3 pc setup
+ros-jazzy-cartographer = "*"
+ros-jazzy-cartographer-ros = "*"
+ros-jazzy-navigation2 = "*"
+ros-jazzy-nav2-bringup = "*"
+# Perception + Apriltags
+ros-jazzy-apriltag-ros = { path = "pixi/apriltag_ros" }
+# Turtlebot 3 simulation and dependencies
+ros-jazzy-turtlebot3 = "*"
+ros-jazzy-turtlebot3-gazebo = "*"
+ros-jazzy-turtlebot3-msgs = "*"
+ros-jazzy-dynamixel-sdk = "*"
+
+[activation]
+scripts = ["pixi/activate.sh"]
+
+[tasks]
+build = "colcon build --symlink-install --cmake-args -G Ninja"
+clean = "rm -rf build install log"
+zenoh = "ros2 run rmw_zenoh_cpp rmw_zenohd"
