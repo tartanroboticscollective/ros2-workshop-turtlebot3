@@ -39,11 +39,13 @@ repos:
       - id: check-xml
       - id: check-yaml
       - id: debug-statements
-      - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: trailing-whitespace
         exclude_types: [rst]
       - id: fix-byte-order-marker
+      - id: end-of-file-fixer
+        exclude: \.(lock|patch)$
+      - id: trailing-whitespace
+        exclude: \.(lock|patch)$
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
@@ -114,7 +116,7 @@ repos:
     hooks:
       - id: codespell
         args: ['--write-changes', '--uri-ignore-words-list=ist', '-L rsource']
-        exclude: CHANGELOG\.rst|\.(svg|pyc|drawio|dae)$
+        exclude: CHANGELOG\.rst|\.(svg|pyc|drawio|dae|lock)$
 
   # Check Github files
   - repo: https://github.com/python-jsonschema/check-jsonschema
@@ -143,10 +145,3 @@ repos:
       - id: prettier-package-xml
       - id: ros-include-guard
       - id: sort-package-xml
-
-  # Dockerfiles
-  - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.15.1
-    hooks:
-      - id: hadolint
-        args: ['--ignore=DL3008']

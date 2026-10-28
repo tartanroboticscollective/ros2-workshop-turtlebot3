@@ -1,0 +1,56 @@
+package:
+  name: ros-jazzy-apriltag-ros
+  version: 3.4.0
+
+source:
+  git: https://github.com/christianrauch/apriltag_ros.git
+  tag: 3.4.0
+  patches:
+    # Link OpenCV 5's geometry module (formerly calib3d), and drop -Werror and
+    # GNU-only linker flags so it also builds on macOS
+    - opencv5-and-macos.patch
+
+build:
+  number: 0
+  script:
+    - cmake -G Ninja -S . -B build ${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX -DBUILD_TESTING=OFF
+    - cmake --build build
+    - cmake --install build
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('c') }}
+    - cmake <4
+    - ninja
+    - pkg-config
+  host:
+    - ros2-distro-mutex
+    - python
+    - numpy
+    - libopencv
+    - eigen
+    - apriltag
+    - ros-jazzy-ament-cmake
+    - ros-jazzy-ros-workspace
+    - ros-jazzy-rclcpp
+    - ros-jazzy-rclcpp-components
+    - ros-jazzy-sensor-msgs
+    - ros-jazzy-tf2-ros
+    - ros-jazzy-apriltag-msgs
+    - ros-jazzy-image-transport
+    - ros-jazzy-cv-bridge
+  run:
+    - ros-jazzy-rclcpp
+    - ros-jazzy-rclcpp-components
+    - ros-jazzy-sensor-msgs
+    - ros-jazzy-tf2-ros
+    - ros-jazzy-apriltag-msgs
+    - ros-jazzy-image-transport
+    - ros-jazzy-image-transport-plugins
+    - ros-jazzy-image-proc
+    - ros-jazzy-cv-bridge
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/apriltag_ros/apriltag_node
