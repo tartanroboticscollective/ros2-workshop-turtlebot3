@@ -193,7 +193,7 @@ tmux send-keys -t "$MAIN_PANE" \
 tmux send-keys -t "$TELEOP_PANE" \
     "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL terminal" C-m \
     "echo 'WARNING: Running teleoperation while Navigation is running sends conflicting commands to the turtlebot!'" C-m \
-    "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
+    "pixi run teleop --ros-args -p use_sim_time:=true"
 
 tmux send-keys -t "$ZENOH_PANE" \
     "bash '$SCRIPT_PATH' -m $TURTLEBOT3_MODEL zenoh" C-m
