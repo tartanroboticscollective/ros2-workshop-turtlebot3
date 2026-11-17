@@ -13,8 +13,6 @@ preview = ["pixi-build"]
 # Core dependencies
 ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
-# Newer versions break `colcon build --symlink-install` for ament_python packages
-setuptools = "<80"
 # Build tools for ament_cmake packages (apriltag_find_interfaces)
 compilers = "*"
 cmake = "<4"
