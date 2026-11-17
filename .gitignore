@@ -1,1 +1,7 @@
 __pycache__/
+
+# pixi
+.pixi/
+build/
+install/
+log/

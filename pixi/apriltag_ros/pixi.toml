@@ -1,0 +1,8 @@
+# apriltag_ros built from source: the robostack-jazzy binary can't be installed
+# alongside the rest of the workshop dependencies, and has no osx-arm64 build.
+[package]
+name = "ros-jazzy-apriltag-ros"
+version = "3.4.0"
+
+[package.build]
+backend = { name = "pixi-build-rattler-build", version = "*" }

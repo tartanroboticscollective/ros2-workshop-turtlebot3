@@ -1,0 +1,9 @@
+# Interactive shell used by the workshop tmux panes
+
+cd "$PIXI_PROJECT_ROOT" || return
+
+PS1='(ros2-workshop) \w\$ '
+
+alias rsource='source "$PIXI_PROJECT_ROOT/install/setup.bash"'
+alias rbuild='pixi run build'
+alias rclean='pixi run clean'

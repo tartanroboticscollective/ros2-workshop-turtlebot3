@@ -43,17 +43,19 @@ We encourage you to actively participate, ask questions, and share your own insi
 
 ## Requirements
 
-:computer: Ubuntu laptop
+:computer: Ubuntu or macOS (Apple Silicon) laptop
 
 :pager: [Tmux](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Tmux-Setup)
 
-:whale2: [Docker](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Docker-Setup)
+:package: [Pixi](https://pixi.prefix.dev/latest/installation/)
+
+The `start_*.sh` scripts install the ROS 2 environment from `pixi.toml` on first run. Run `pixi run build` to build the workshop packages in `src/`.
 
 Please see our [Setup Instructions](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki#setup) and more in our Wiki.
 
 ## Tutorials
 
-### 0: Introduction + 2D Turtlesim (ROS2 Basics, Tmux, Docker, Teleoperation)
+### 0: Introduction + 2D Turtlesim (ROS2 Basics, Tmux, Pixi, Teleoperation)
 
 [Introduction to ROS2](https://github.com/tartanroboticscollective/ros2-workshop-turtlebot3/wiki/Introduction)
 
@@ -78,10 +80,10 @@ Please see our [Setup Instructions](https://github.com/tartanroboticscollective/
 ---
 ## FAQ
 
-In order to be able to run **graphical user interfaces** from inside the Docker you might have to type
+To open a shell in the workshop environment outside of the tmux sessions, run
 
 ```bash
-$ xhost +
+$ pixi shell
 ```
 
 ---

@@ -1,0 +1,88 @@
+package:
+  name: ros2-cartographer-ros
+  version: 2.0.9003
+
+source:
+  git: https://github.com/ros2-gbp/cartographer_ros-release.git
+  tag: release/jazzy/cartographer_ros/2.0.9003-2
+  patches:
+    # Copied verbatim from RoboStack/ros-jazzy (patch/ros-jazzy-cartographer-ros.patch)
+    - ros-jazzy-cartographer-ros.patch
+    # Fix cartographer_node aborting at startup when built as a shared library
+    - shared-lib-duplicate-gflags.patch
+
+build:
+  number: 0
+  script:
+    - export ROS_DISTRO=jazzy
+    - cmake -G Ninja -S . -B build ${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF
+    - cmake --build build
+    - cmake --install build
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('c') }}
+    - if: osx
+      then:
+        # Match robostack-jazzy's clang 21: libc++ 23 removed std::wstring_convert,
+        # which rosidl_runtime_cpp still uses
+        - libcxx-devel 21.*
+    - cmake <4
+    - ninja
+    - pkg-config
+  host:
+    - ros2-distro-mutex
+    - python
+    - numpy
+    - cartographer 2.*
+    - eigen
+    - gflags
+    - glog
+    - libabseil
+    - libboost-devel
+    - pcl
+    - vtk-base
+    - ros2-ament-cmake
+    - ros2-ros-workspace
+    - ros2-builtin-interfaces
+    - ros2-cartographer
+    - ros2-cartographer-ros-msgs
+    - ros2-geometry-msgs
+    - ros2-nav-msgs
+    - ros2-pcl-conversions
+    - ros2-rclcpp
+    - ros2-rosbag2-cpp
+    - ros2-rosbag2-storage
+    - ros2-sensor-msgs
+    - ros2-std-msgs
+    - ros2-tf2
+    - ros2-tf2-eigen
+    - ros2-tf2-msgs
+    - ros2-tf2-ros
+    - ros2-urdf
+    - ros2-visualization-msgs
+  run:
+    - ros2-builtin-interfaces
+    - ros2-cartographer
+    - ros2-cartographer-ros-msgs
+    - ros2-geometry-msgs
+    - ros2-launch
+    - ros2-nav-msgs
+    - ros2-pcl-conversions
+    - ros2-rclcpp
+    - ros2-robot-state-publisher
+    - ros2-rosbag2-cpp
+    - ros2-rosbag2-storage
+    - ros2-sensor-msgs
+    - ros2-std-msgs
+    - ros2-tf2
+    - ros2-tf2-eigen
+    - ros2-tf2-msgs
+    - ros2-tf2-ros
+    - ros2-urdf
+    - ros2-visualization-msgs
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/cartographer_ros/cartographer_node

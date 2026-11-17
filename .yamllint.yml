@@ -3,6 +3,11 @@ yaml-files:
   - "*.yml"
   - .yamllint
 
+extends: default
+
+ignore: |
+  **/recipe.yaml
+
 rules:
   braces: enable
   brackets: enable

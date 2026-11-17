@@ -1,0 +1,36 @@
+Build offline_node.cpp into cartographer_offline_node, not the library
+
+offline_node.cpp defines gflags (collect_metrics, configuration_directory,
+...) that node_main.cpp and assets_writer_main.cpp define too. Upstream
+builds the library statically, so the linker leaves offline_node.o out of
+the other executables. With BUILD_SHARED_LIBS=ON every executable loads it,
+gflags registers each flag twice, and cartographer_node aborts at startup:
+
+  ERROR: flag 'collect_metrics' was defined more than once (in files
+  'src/offline_node.cpp' and 'src/node_main.cpp').
+
+Applies on top of RoboStack's ros-jazzy-cartographer-ros.patch.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 31e2f96..6c79e7c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -80,7 +80,6 @@ add_library(${PROJECT_NAME}
+   src/node_constants.cpp
+   src/node.cpp
+   src/node_options.cpp
+-  src/offline_node.cpp
+   src/playable_bag.cpp
+   src/ros_log_sink.cpp
+   src/ros_map.cpp
+@@ -130,7 +129,9 @@ add_executable(cartographer_occupancy_grid_node src/occupancy_grid_node_main.cpp
+ target_link_libraries(cartographer_occupancy_grid_node ${PROJECT_NAME})
+ ament_target_dependencies(cartographer_occupancy_grid_node ${dependencies})
+ 
+-add_executable(cartographer_offline_node src/offline_node_main.cpp)
++# offline_node.cpp defines the same gflags as node_main.cpp and
++# assets_writer_main.cpp, so it must not be part of a shared library
++add_executable(cartographer_offline_node src/offline_node_main.cpp src/offline_node.cpp)
+ target_link_libraries(cartographer_offline_node ${PROJECT_NAME})
+ ament_target_dependencies(cartographer_offline_node ${dependencies})
+ 
