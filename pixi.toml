@@ -1,7 +1,7 @@
 [workspace]
 name = "ros2-workshop-turtlebot3"
 description = "ROS 2 Turtlebot 3 Jazzy workshop environment"
-channels = ["https://prefix.dev/robostack-jazzy", "https://prefix.dev/conda-forge"]
+channels = ["https://prefix.dev/robostack-jazzy"]
 platforms = [
     "linux-64",
     "linux-aarch64",
