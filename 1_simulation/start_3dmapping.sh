@@ -180,8 +180,8 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     exec tmux attach-session -t "$SESSION_NAME"
 fi
 
-# Install the pixi environment before starting any panes
-pixi install || exit 1
+# Install the pixi environment from pixi.lock before starting any panes
+pixi install --locked || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 
