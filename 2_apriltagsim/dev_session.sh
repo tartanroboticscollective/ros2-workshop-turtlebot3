@@ -34,10 +34,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-open_pixi_shell() {
-    pixi run bash --rcfile pixi/bashrc -i
-}
-
 start_zenoh() {
     if pgrep -x rmw_zenohd >/dev/null; then
         echo "Zenoh router is already running."
@@ -75,7 +71,7 @@ case "${1:-}" in
     terminal)
         wait_for_zenoh
         echo "Opening shell in the pixi environment..."
-        open_pixi_shell
+        pixi run workshop-shell
         exit $?
         ;;
 

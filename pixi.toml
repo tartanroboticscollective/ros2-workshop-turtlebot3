@@ -55,6 +55,8 @@ scripts = ["pixi/activate.sh"]
 [tasks]
 build = "colcon build --symlink-install --cmake-args -G Ninja"
 clean = "rm -rf build install log"
+# Interactive shell in the workshop environment, opened in the tmux terminal panes
+workshop-shell = "bash --rcfile pixi/bashrc -i"
 # Workshop processes, run by the tmux sessions in the start_*.sh scripts.
 # Extra arguments are appended, e.g. `pixi run teleop --ros-args -p use_sim_time:=true`
 zenoh = "ros2 run rmw_zenoh_cpp rmw_zenohd"
