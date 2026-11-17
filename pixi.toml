@@ -20,7 +20,7 @@ ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
 # Build tools for ament_cmake packages (apriltag_find_interfaces)
 compilers = "*"
-cmake = "<4"
+cmake = "*"
 ninja = "*"
 pkg-config = "*"
 # Dev tools
