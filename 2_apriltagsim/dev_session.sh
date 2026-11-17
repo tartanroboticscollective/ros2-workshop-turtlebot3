@@ -5,6 +5,9 @@ SESSION_NAME="ros2-workshop"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 
+# pixi finds pixi.toml from the workspace root
+cd "$WS_PATH" || exit 1
+
 export ROS_DOMAIN_ID=1
 export TURTLEBOT3_MODEL=burger
 
@@ -32,11 +35,11 @@ wait_for_zenoh() {
 }
 
 run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
+    pixi run bash -c "$1"
 }
 
 open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
+    pixi run bash --rcfile pixi/bashrc -i
 }
 
 start_zenoh() {
@@ -46,7 +49,7 @@ start_zenoh() {
     fi
 
     echo "Starting Zenoh router..."
-    pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+    pixi run zenoh
 }
 
 stop_session() {
@@ -140,7 +143,7 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
 fi
 
 # Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
+pixi install || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 

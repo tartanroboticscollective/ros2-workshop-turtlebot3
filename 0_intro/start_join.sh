@@ -5,6 +5,9 @@ SESSION_NAME="ros2-join"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
+# pixi finds pixi.toml from the workspace root
+cd "$WS_PATH" || exit 1
+
 TURTLE_NAME="turtle_$((1 + $RANDOM % 100000))"
 RANDOM_X=$((1 + $RANDOM % 10))
 RANDOM_Y=$((1 + $RANDOM % 10))
@@ -26,11 +29,11 @@ wait_for_zenoh() {
 }
 
 run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
+    pixi run bash -c "$1"
 }
 
 open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
+    pixi run bash --rcfile pixi/bashrc -i
 }
 
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
@@ -77,7 +80,7 @@ case "${1:-}" in
     zenoh)
         echo "Starting Zenoh router..."
         ZENOH_CONFIG_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.1.3:7447"]' \
-            pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+            pixi run zenoh
         tmux kill-session -t "$SESSION_NAME"
         ;;
 
@@ -129,7 +132,7 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
 fi
 
 # Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
+pixi install || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 
