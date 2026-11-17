@@ -100,10 +100,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-run_in_pixi() {
-    pixi run bash -c "$1"
-}
-
 open_pixi_shell() {
     pixi run bash --rcfile pixi/bashrc -i
 }
@@ -160,19 +156,19 @@ case "${1:-}" in
     teleop)
         wait_for_zenoh
         echo "Starting TurtleBot3 teleop..."
-        run_in_pixi "ros2 run turtlebot3_teleop teleop_keyboard --ros-args"
+        pixi run teleop
         ;;
 
     rviz)
         wait_for_zenoh
         echo "Starting RViz2..."
-        run_in_pixi "ros2 run rviz2 rviz2 -d '$WS_PATH/config/default.rviz' --ros-args -p use_sim_time:=true"
+        pixi run rviz
         ;;
 
     rqt_graph)
         wait_for_zenoh
         echo "Starting rqt_graph..."
-        run_in_pixi "rqt_graph"
+        pixi run rqt-graph
         ;;
 
     "")

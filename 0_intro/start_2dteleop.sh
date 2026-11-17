@@ -24,10 +24,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-run_in_pixi() {
-    pixi run bash -c "$1"
-}
-
 open_pixi_shell() {
     pixi run bash --rcfile pixi/bashrc -i
 }
@@ -83,19 +79,19 @@ case "${1:-}" in
     teleop)
         wait_for_zenoh
         echo "Starting Turtle teleop..."
-        run_in_pixi "ros2 run turtlesim turtle_teleop_key"
+        pixi run turtlesim-teleop
         ;;
 
     turtlesim)
         wait_for_zenoh
         echo "Starting TurtleSim2D..."
-        run_in_pixi "ros2 run turtlesim turtlesim_node"
+        pixi run turtlesim
         ;;
 
     rqt_graph)
         wait_for_zenoh
         echo "Starting rqt_graph..."
-        run_in_pixi "rqt_graph"
+        pixi run rqt-graph
         ;;
 
     "")
