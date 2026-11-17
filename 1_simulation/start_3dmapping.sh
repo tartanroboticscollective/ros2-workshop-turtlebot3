@@ -63,10 +63,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-open_pixi_shell() {
-    pixi run bash --rcfile pixi/bashrc -i
-}
-
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
 wait_and_set_top() {
     local title="$1"
@@ -117,7 +113,7 @@ case "${1:-}" in
             ( sleep 2; tmux send-keys -t "$TMUX_PANE" -l "$MAP_SAVE_CMD" ) &
         fi
 
-        open_pixi_shell
+        pixi run workshop-shell
         exit 0
         ;;
 

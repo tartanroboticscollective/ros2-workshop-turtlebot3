@@ -100,10 +100,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-open_pixi_shell() {
-    pixi run bash --rcfile pixi/bashrc -i
-}
-
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
 wait_and_set_top() {
     local title="$1"
@@ -143,7 +139,7 @@ case "${1:-}" in
         echo "Opening shell in the pixi environment..."
         wait_and_set_top "RViz"
         wait_and_set_top "rqt_graph"
-        open_pixi_shell
+        pixi run workshop-shell
         ;;
 
     zenoh)
