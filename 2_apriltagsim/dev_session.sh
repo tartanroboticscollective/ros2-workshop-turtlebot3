@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# tiny fix amd gpu PLEASE DONT REMOVE
-if command -v xhost >/dev/null; then
-    xhost +
-fi
-
-
 SESSION_NAME="ros2-workshop"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
@@ -13,9 +7,6 @@ WS_PATH="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 
 export ROS_DOMAIN_ID=1
 export TURTLEBOT3_MODEL=burger
-
-## amd gazebo fix. PLEASE DONT REMOVE
-export GZ_IP=127.0.0.1
 
 # ================================================================
 # Pixi helpers
