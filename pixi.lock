@@ -22,7 +22,6 @@ environments:
   default:
     channels:
     - url: https://prefix.dev/robostack-jazzy/
-    - url: https://prefix.dev/conda-forge/
     packages:
       linux-64:
       - conda: https://prefix.dev/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
@@ -63,7 +62,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/cffi-2.1.1-py314h8d76f0c_4.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cgns-4.5.2-haeb83df_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/cli11-2.7.2-h54a6638_1.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/cmake-3.31.8-hc85cc9f_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/cmake-4.5.0-hff7ac6b_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/colcon-common-extensions-0.3.0-py314h9e666f3_5.conda
       - conda: https://prefix.dev/conda-forge/linux-64/collada-dom-2.5.0-ha80e7d1_14.conda
       - conda: https://prefix.dev/conda-forge/linux-64/compilers-2.0.0-ha770c72_1.conda
@@ -1113,7 +1112,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-aarch64/cffi-2.1.1-py314h65cb5ac_4.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/cgns-4.5.2-hec72b32_0.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/cli11-2.7.2-h7ac5ae9_1.conda
-      - conda: https://prefix.dev/conda-forge/linux-aarch64/cmake-3.31.8-hc9d863e_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/cmake-4.5.0-hcbeb305_0.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/colcon-common-extensions-0.3.0-py314h064b4d9_5.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/collada-dom-2.5.0-h3bb7421_14.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/compilers-2.0.0-h8af1aa0_1.conda
@@ -2265,7 +2264,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/osx-arm64/clangxx-21.1.8-default_cfg_h7f0254a_7.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/clangxx_impl_osx-arm64-21.1.8-default_hc11f16d_7.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/cli11-2.7.2-h784d473_1.conda
-      - conda: https://prefix.dev/conda-forge/osx-arm64/cmake-3.31.8-h54ad630_0.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/cmake-4.5.0-h07a7c03_0.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/colcon-common-extensions-0.3.0-py314h6ffbfce_5.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/collada-dom-2.5.0-hec4740e_14.conda
       - conda: https://prefix.dev/conda-forge/osx-arm64/compiler-rt-21.1.8-hce30654_2.conda
