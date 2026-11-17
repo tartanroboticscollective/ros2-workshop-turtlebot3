@@ -95,7 +95,7 @@ wait_and_set_top() {
 }
 
 # Command pre-typed (but not executed) in the main terminal pane
-MAP_SAVE_CMD="ros2 run nav2_map_server map_saver_cli -f maps/map"
+MAP_SAVE_CMD="pixi run map-save"
 
 # ================================================================
 # Commands run by individual panes
