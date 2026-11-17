@@ -1,7 +1,7 @@
 [workspace]
 name = "ros2-workshop-turtlebot3"
 description = "ROS 2 Turtlebot 3 Jazzy workshop environment"
-channels = ["https://prefix.dev/robostack-jazzy", "https://prefix.dev/conda-forge"]
+channels = ["https://prefix.dev/robostack-jazzy"]
 platforms = [
     "linux-64",
     "linux-aarch64",
@@ -13,8 +13,6 @@ preview = ["pixi-build"]
 # Core dependencies
 ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
-# Newer versions break `colcon build --symlink-install` for ament_python packages
-setuptools = "<80"
 # Build tools for ament_cmake packages (apriltag_find_interfaces)
 compilers = "*"
 cmake = "<4"
