@@ -63,10 +63,6 @@ wait_for_zenoh() {
     echo "Zenoh router is running."
 }
 
-run_in_pixi() {
-    pixi run bash -c "$1"
-}
-
 open_pixi_shell() {
     pixi run bash --rcfile pixi/bashrc -i
 }
@@ -135,7 +131,7 @@ case "${1:-}" in
     teleop)
         wait_for_zenoh
         echo "Starting TurtleBot3 teleop..."
-        run_in_pixi "ros2 run turtlebot3_teleop teleop_keyboard"
+        pixi run teleop
         exit 0
         ;;
 
@@ -145,14 +141,14 @@ case "${1:-}" in
         # gz sim survives the SIGHUP sent when the tmux session is killed,
         # so take down this pane's whole process group on exit
         trap 'kill -TERM -- -$$' EXIT
-        run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+        pixi run gazebo
         exit 0
         ;;
 
     cartographer)
         wait_for_zenoh
         echo "Starting Cartographer..."
-        run_in_pixi "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True cartographer_config_dir:=\$CARTOGRAPHER_CONFIG_DIR"
+        pixi run cartographer
         exit 0
         ;;
 

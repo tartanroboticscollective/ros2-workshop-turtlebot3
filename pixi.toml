@@ -63,4 +63,14 @@ scripts = ["pixi/activate.sh"]
 [tasks]
 build = "colcon build --symlink-install --cmake-args -G Ninja"
 clean = "rm -rf build install log"
+# Workshop processes, run by the tmux sessions in the start_*.sh scripts.
+# Extra arguments are appended, e.g. `pixi run teleop --ros-args -p use_sim_time:=true`
 zenoh = "ros2 run rmw_zenoh_cpp rmw_zenohd"
+turtlesim = "ros2 run turtlesim turtlesim_node"
+turtlesim-teleop = "ros2 run turtlesim turtle_teleop_key"
+rqt-graph = "rqt_graph"
+teleop = "ros2 run turtlebot3_teleop teleop_keyboard"
+rviz = "ros2 run rviz2 rviz2 -d $PIXI_PROJECT_ROOT/config/default.rviz --ros-args -p use_sim_time:=true"
+gazebo = "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+cartographer = "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True cartographer_config_dir:=$CARTOGRAPHER_CONFIG_DIR"
+navigation = "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=$PIXI_PROJECT_ROOT/maps/map.yaml use_sim_time:=True"
