@@ -8,6 +8,7 @@ platforms = [
     { name = "osx-arm64-macos-14", platform = "osx-arm64", macos = "14.0" },
 ]
 preview = ["pixi-build"]
+requires-pixi = ">=0.84.0"
 
 [dependencies]
 # Core dependencies
