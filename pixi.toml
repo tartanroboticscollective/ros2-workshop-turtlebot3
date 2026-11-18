@@ -8,6 +8,7 @@ platforms = [
     { name = "osx-arm64-macos-14", platform = "osx-arm64", macos = "14.0" },
 ]
 preview = ["pixi-build"]
+requires-pixi = ">=0.84.0"
 
 # Pin the ROS distro mutex used by the source-built packages (apriltag_ros,
 # cartographer_ros). ros-gz <1.0.25 has no builds for mutex 0.21.
