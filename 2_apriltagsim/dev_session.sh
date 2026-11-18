@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
+source "$(dirname "${BASH_SOURCE[0]}")/../setup/common.sh"
+
 SESSION_NAME="ros2-workshop"
-
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-WS_PATH="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
-
-# pixi finds pixi.toml from the workspace root
-cd "$WS_PATH" || exit 1
 
 export ROS_DOMAIN_ID=1
 export TURTLEBOT3_MODEL=burger
@@ -21,17 +17,6 @@ Usage: dev_session.sh [--stop]
 
   --stop    Stop the tmux session.
 EOF
-}
-
-wait_for_zenoh() {
-    echo "Waiting for the Zenoh router to be running..."
-
-    # Wait for the router port (see zenoh/ROUTER_CONFIG.json5) to accept connections
-    while ! (echo >/dev/tcp/127.0.0.1/7447) 2>/dev/null; do
-        sleep 1
-    done
-
-    echo "Zenoh router is running."
 }
 
 start_zenoh() {
@@ -90,10 +75,7 @@ case "${1:-}" in
     gazebo)
         wait_for_zenoh
         echo "Starting TurtleBot3 Burger Gazebo..."
-        # gz sim survives the SIGHUP sent when the tmux session is killed,
-        # so take down this pane's whole process group on exit
-        trap 'kill -TERM -- -$$' EXIT
-        pixi run gazebo
+        run_gazebo
         exit $?
         ;;
 
@@ -130,17 +112,7 @@ esac
 # └────────────────────────────────────────────────────┘
 # ================================================================
 
-if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-    exec tmux attach-session -t "$SESSION_NAME"
-fi
-
-# Install the pixi environment from pixi.lock before starting any panes
-pixi install --locked || exit 1
-
-tmux new-session -d -s "$SESSION_NAME"
-
-# Main / Gazebo
-MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
+new_session
 
 
 # Main / Teleop
@@ -163,21 +135,11 @@ T_3=$(tmux split-window \
 # Start pane processes
 # ================================================================
 
-tmux send-keys -t "$MAIN_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$ZENOH_PANE" \
-    "bash '$SCRIPT_PATH' zenoh" C-m
-
-tmux send-keys -t "$EMPTY_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$T_2" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$T_3" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
+start_pane "$MAIN_PANE" terminal
+start_pane "$ZENOH_PANE" zenoh
+start_pane "$EMPTY_PANE" terminal
+start_pane "$T_2" terminal
+start_pane "$T_3" terminal
 
 # Start with keyboard focus on Teleop.
 tmux select-pane -t "$MAIN_PANE"
