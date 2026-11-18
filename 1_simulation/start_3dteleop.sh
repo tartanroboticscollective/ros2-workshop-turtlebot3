@@ -45,6 +45,9 @@ SESSION_NAME="ros2-workshop"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
+# pixi finds pixi.toml from the workspace root
+cd "$WS_PATH" || exit 1
+
 # ================================================================
 # Pixi helpers
 # ================================================================
@@ -58,14 +61,6 @@ wait_for_zenoh() {
     done
 
     echo "Zenoh router is running."
-}
-
-run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
-}
-
-open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
 }
 
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
@@ -107,19 +102,19 @@ case "${1:-}" in
         echo "Opening shell in the pixi environment..."
         wait_and_set_top "Gazebo"
         wait_and_set_top "RViz"
-        open_pixi_shell
+        pixi run workshop-shell
         ;;
 
     zenoh)
         echo "Starting Zenoh router..."
-        pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+        pixi run zenoh
         tmux kill-session -t "$SESSION_NAME"
         ;;
 
     teleop)
         wait_for_zenoh
         echo "Starting TurtleBot3 teleop..."
-        run_in_pixi "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
+        pixi run teleop --ros-args -p use_sim_time:=true
         ;;
 
     gazebo)
@@ -128,13 +123,13 @@ case "${1:-}" in
         # gz sim survives the SIGHUP sent when the tmux session is killed,
         # so take down this pane's whole process group on exit
         trap 'kill -TERM -- -$$' EXIT
-        run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+        pixi run gazebo
         ;;
 
     rviz)
         wait_for_zenoh
         echo "Starting RViz2..."
-        run_in_pixi "ros2 run rviz2 rviz2 -d '$WS_PATH/config/default.rviz' --ros-args -p use_sim_time:=true"
+        pixi run rviz
         ;;
 
     "")
@@ -165,8 +160,8 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     exec tmux attach-session -t "$SESSION_NAME"
 fi
 
-# Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
+# Install the pixi environment from pixi.lock before starting any panes
+pixi install --locked || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 

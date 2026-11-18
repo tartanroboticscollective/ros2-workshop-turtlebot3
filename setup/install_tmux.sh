@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Install dependencies
-sudo apt update && sudo apt -y install tmux
+# tmux itself is provided by the pixi environment (see pixi.toml)
 
 # Install config
-cp $(pwd)/tmux.conf $HOME/.tmux.conf
+cp "$(dirname "${BASH_SOURCE[0]}")/tmux.conf" "$HOME/.tmux.conf"
