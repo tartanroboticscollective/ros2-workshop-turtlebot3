@@ -22,6 +22,12 @@ ln -sf "$CONDA_PREFIX"/share/cartographer/configuration_files/*.lua \
     "$CONDA_PREFIX"/share/turtlebot3_cartographer/config/*.lua \
     "$CARTOGRAPHER_CONFIG_DIR"/
 
+# pixi doesn't run conda post-link scripts, so graphviz never registers its
+# plugins (rqt_graph: 'Format: "dot" not recognized'); run it ourselves
+if [ -f "$CONDA_PREFIX/bin/.graphviz-post-link.sh" ]; then
+    PREFIX="$CONDA_PREFIX" bash "$CONDA_PREFIX/bin/.graphviz-post-link.sh"
+fi
+
 # Workshop packages, once built with `pixi run build`
 if [ -f "$PIXI_PROJECT_ROOT/install/setup.sh" ]; then
     . "$PIXI_PROJECT_ROOT/install/setup.sh"
