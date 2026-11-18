@@ -5,6 +5,9 @@ SESSION_NAME="ros2-join"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
+# pixi finds pixi.toml from the workspace root
+cd "$WS_PATH" || exit 1
+
 TURTLE_NAME="turtle_$((1 + $RANDOM % 100000))"
 RANDOM_X=$((1 + $RANDOM % 10))
 RANDOM_Y=$((1 + $RANDOM % 10))
@@ -23,14 +26,6 @@ wait_for_zenoh() {
     done
 
     echo "Zenoh router is running."
-}
-
-run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
-}
-
-open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
 }
 
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
@@ -71,13 +66,13 @@ case "${1:-}" in
         clear
         echo "Opening shell in the pixi environment..."
         wait_and_set_top "rqt_graph"
-        open_pixi_shell
+        pixi run workshop-shell
         ;;
 
     zenoh)
         echo "Starting Zenoh router..."
         ZENOH_CONFIG_OVERRIDE='mode="router";connect/endpoints=["tcp/192.168.1.3:7447"]' \
-            pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+            pixi run zenoh
         tmux kill-session -t "$SESSION_NAME"
         ;;
 
@@ -85,19 +80,19 @@ case "${1:-}" in
         wait_for_zenoh
         echo "Starting Turtle teleop..."
         echo $2
-        run_in_pixi "ros2 run turtlesim turtle_teleop_key --ros-args --remap __node:=$2 --remap turtle1/cmd_vel:=$2/cmd_vel"
+        pixi run turtlesim-teleop --ros-args --remap "__node:=$2" --remap "turtle1/cmd_vel:=$2/cmd_vel"
         ;;
 
     turtle_spawn)
         wait_for_zenoh
         echo "Spawning new turtle..."
-        run_in_pixi "ros2 service call /spawn turtlesim/srv/Spawn \"{x: $RANDOM_X, y: $RANDOM_Y, theta: $RANDOM_T, name: '$2'}\""
+        pixi run ros2 service call /spawn turtlesim/srv/Spawn "{x: $RANDOM_X, y: $RANDOM_Y, theta: $RANDOM_T, name: '$2'}"
         ;;
 
     rqt_graph)
         wait_for_zenoh
         echo "Starting rqt_graph..."
-        run_in_pixi "rqt_graph"
+        pixi run rqt-graph
         ;;
 
     "")
@@ -128,8 +123,8 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     exec tmux attach-session -t "$SESSION_NAME"
 fi
 
-# Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
+# Install the pixi environment from pixi.lock before starting any panes
+pixi install --locked || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 

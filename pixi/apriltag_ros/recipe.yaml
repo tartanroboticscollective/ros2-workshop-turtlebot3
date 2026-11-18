@@ -21,7 +21,12 @@ requirements:
   build:
     - ${{ compiler('cxx') }}
     - ${{ compiler('c') }}
-    - cmake <4
+    - if: osx
+      then:
+        # Match robostack-jazzy's clang 21: libc++ 23 removed std::wstring_convert,
+        # which rosidl_runtime_cpp still uses
+        - libcxx-devel 21.*
+    - cmake
     - ninja
     - pkg-config
   host:
