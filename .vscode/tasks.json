@@ -4,23 +4,12 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // Import repositories with vcs tool
-    {
-      "label": "vcs",
-      "detail": "Import dependencies with vcs tool.",
-      "type": "shell",
-      "command": "vcs import < .repos",
-      "options": {
-        "cwd": "${workspaceFolder}/src"
-      },
-      "problemMatcher": []
-    },
-    // Install ROS dependencies
+    // Install the pixi environment
     {
       "label": "install dependencies",
-      "detail": "Install all dependencies specified in the workspaces package.xml files.",
+      "detail": "Install the pixi environment from pixi.toml.",
       "type": "shell",
-      "command": "sudo apt-get update -y && rosdep update && rosdep install --from-paths src --ignore-src -y",
+      "command": "pixi install",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -31,7 +20,7 @@
       "label": "build",
       "detail": "Build the workspace (release).",
       "type": "shell",
-      "command": "colcon build --symlink-install --cmake-args '-DCMAKE_BUILD_TYPE=Release' -Wall -Wextra -Wpedantic",
+      "command": "pixi run build -DCMAKE_BUILD_TYPE=Release",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -45,7 +34,7 @@
       "label": "build debug",
       "detail": "Build the workspace (debug).",
       "type": "shell",
-      "command": "colcon build --symlink-install --cmake-args '-DCMAKE_BUILD_TYPE=Debug' -Wall -Wextra -Wpedantic",
+      "command": "pixi run build -DCMAKE_BUILD_TYPE=Debug",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -57,7 +46,7 @@
       "label": "test",
       "detail": "Run all unit tests and show results.",
       "type": "shell",
-      "command": "colcon test",
+      "command": "pixi run colcon test",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -70,30 +59,13 @@
     // Clean tasks
     {
       "label": "clean",
-      "detail": "Run the clean target.",
+      "detail": "Delete the build, install and log directories.",
       "type": "shell",
-      "command": "colcon clean workspace --yes",
+      "command": "pixi run clean",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
-    },
-    {
-      "label": "purge",
-      "detail": "Purge workspace by deleting all generated files.",
-      "type": "shell",
-      "command": "rm -fr build install log && py3clean .",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    }
-  ],
-  "inputs": [
-    {
-      "id": "package",
-      "type": "promptString",
-      "description": "Package name"
     }
   ]
 }
