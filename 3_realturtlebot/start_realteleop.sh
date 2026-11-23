@@ -82,6 +82,9 @@ SESSION_NAME="ros2-workshop"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 WS_PATH="${SCRIPT_PATH%/*/*}"
 
+# pixi finds pixi.toml from the workspace root
+cd "$WS_PATH" || exit 1
+
 # ================================================================
 # Pixi helpers
 # ================================================================
@@ -95,14 +98,6 @@ wait_for_zenoh() {
     done
 
     echo "Zenoh router is running."
-}
-
-run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
-}
-
-open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
 }
 
 # Keep GUI windows on top: wmctrl on Linux (X11), System Events on macOS
@@ -144,32 +139,32 @@ case "${1:-}" in
         echo "Opening shell in the pixi environment..."
         wait_and_set_top "RViz"
         wait_and_set_top "rqt_graph"
-        open_pixi_shell
+        pixi run workshop-shell
         ;;
 
     zenoh)
         echo "Starting Zenoh router..."
         ZENOH_CONFIG_OVERRIDE='mode="router";connect/endpoints=["tcp/'"$TURTLEBOT3_IP"':7447"]' \
-            pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+            pixi run zenoh
         tmux kill-session -t "$SESSION_NAME"
         ;;
 
     teleop)
         wait_for_zenoh
         echo "Starting TurtleBot3 teleop..."
-        run_in_pixi "ros2 run turtlebot3_teleop teleop_keyboard --ros-args"
+        pixi run teleop
         ;;
 
     rviz)
         wait_for_zenoh
         echo "Starting RViz2..."
-        run_in_pixi "ros2 run rviz2 rviz2 -d '$WS_PATH/config/default.rviz' --ros-args -p use_sim_time:=true"
+        pixi run rviz
         ;;
 
     rqt_graph)
         wait_for_zenoh
         echo "Starting rqt_graph..."
-        run_in_pixi "rqt_graph"
+        pixi run rqt-graph
         ;;
 
     "")
@@ -200,8 +195,8 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
     exec tmux attach-session -t "$SESSION_NAME"
 fi
 
-# Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
+# Install the pixi environment from pixi.lock before starting any panes
+pixi install --locked || exit 1
 
 tmux new-session -d -s "$SESSION_NAME"
 
