@@ -1,23 +1,25 @@
 [workspace]
 name = "ros2-workshop-turtlebot3"
 description = "ROS 2 Turtlebot 3 Jazzy workshop environment"
-channels = ["https://prefix.dev/robostack-jazzy", "https://prefix.dev/conda-forge"]
+channels = ["https://prefix.dev/robostack-jazzy"]
 platforms = [
     "linux-64",
     "linux-aarch64",
     { name = "osx-arm64-macos-14", platform = "osx-arm64", macos = "14.0" },
 ]
 preview = ["pixi-build"]
+requires-pixi = ">=0.84.0"
+
+[environments]
+lint = { features = ["lint"], no-default-feature = true }
 
 [dependencies]
 # Core dependencies
 ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
-# Newer versions break `colcon build --symlink-install` for ament_python packages
-setuptools = "<80"
 # Build tools for ament_cmake packages (apriltag_find_interfaces)
 compilers = "*"
-cmake = "<4"
+cmake = "*"
 ninja = "*"
 pkg-config = "*"
 # Dev tools
@@ -39,8 +41,6 @@ ros-jazzy-foxglove-bridge = "*"
 # Turtlebot 3 pc setup
 ros-jazzy-cartographer = "*"
 ros-jazzy-cartographer-ros = "*"
-# Patched build of the package behind the ros-jazzy-cartographer-ros metapackage
-ros2-cartographer-ros = { path = "pixi/cartographer_ros" }
 ros-jazzy-navigation2 = "*"
 ros-jazzy-nav2-bringup = "*"
 # Perception + Apriltags
@@ -55,6 +55,66 @@ ros-jazzy-dynamixel-sdk = "*"
 scripts = ["pixi/activate.sh"]
 
 [tasks]
-build = "colcon build --symlink-install --cmake-args -G Ninja"
-clean = "rm -rf build install log"
-zenoh = "ros2 run rmw_zenoh_cpp rmw_zenohd"
+build = {
+    cmd = "colcon build --symlink-install --cmake-args -G Ninja",
+    description = "Build the workshop packages in src/",
+}
+clean = {
+    cmd = "rm -rf build install log",
+    description = "Delete the colcon build, install and log directories",
+}
+workshop-shell = {
+    cmd = "bash --rcfile pixi/bashrc -i",
+    description = "Open an interactive shell in the workshop environment",
+}
+# Workshop processes, run by the tmux sessions in the start_*.sh scripts.
+# Extra arguments are appended, e.g. `pixi run teleop --ros-args -p use_sim_time:=true`
+zenoh = {
+    cmd = "ros2 run rmw_zenoh_cpp rmw_zenohd",
+    description = "Start the Zenoh router",
+}
+turtlesim = {
+    cmd = "ros2 run turtlesim turtlesim_node",
+    description = "Start the turtlesim simulator",
+}
+turtlesim-teleop = {
+    cmd = "ros2 run turtlesim turtle_teleop_key",
+    description = "Drive the turtlesim turtle with the keyboard",
+}
+rqt-graph = {
+    cmd = "rqt_graph",
+    description = "Show the ROS graph in rqt",
+}
+teleop = {
+    cmd = "ros2 run turtlebot3_teleop teleop_keyboard",
+    description = "Drive the TurtleBot3 with the keyboard",
+}
+rviz = {
+    cmd = "ros2 run rviz2 rviz2 -d $PIXI_PROJECT_ROOT/config/default.rviz --ros-args -p use_sim_time:=true",
+    description = "Open RViz with the workshop config",
+}
+gazebo = {
+    cmd = "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py",
+    description = "Start the TurtleBot3 world in Gazebo",
+}
+cartographer = {
+    cmd = "ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True cartographer_config_dir:=$CARTOGRAPHER_CONFIG_DIR",
+    description = "Run Cartographer SLAM on the simulated TurtleBot3",
+}
+map-save = {
+    cmd = "ros2 run nav2_map_server map_saver_cli -f $PIXI_PROJECT_ROOT/maps/map",
+    description = "Save the current map to maps/map",
+}
+navigation = {
+    cmd = "ros2 launch turtlebot3_navigation2 navigation2.launch.py map:=$PIXI_PROJECT_ROOT/maps/map.yaml use_sim_time:=True",
+    description = "Run Nav2 on the saved map in maps/",
+}
+
+[feature.lint.dependencies]
+pre-commit = "*"
+
+[feature.lint.tasks]
+lint = {
+    cmd = "pre-commit run --all-files --show-diff-on-failure --hook-stage manual",
+    description = "Run the pre-commit hooks on all files",
+}
