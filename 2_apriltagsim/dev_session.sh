@@ -1,21 +1,11 @@
 #!/usr/bin/env bash
 
-# tiny fix amd gpu PLEASE DONT REMOVE
-if command -v xhost >/dev/null; then
-    xhost +
-fi
-
+source "$(dirname "${BASH_SOURCE[0]}")/../setup/common.sh"
 
 SESSION_NAME="ros2-workshop"
 
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-WS_PATH="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
-
 export ROS_DOMAIN_ID=1
 export TURTLEBOT3_MODEL=burger
-
-## amd gazebo fix. PLEASE DONT REMOVE
-export GZ_IP=127.0.0.1
 
 # ================================================================
 # Pixi helpers
@@ -29,25 +19,6 @@ Usage: dev_session.sh [--stop]
 EOF
 }
 
-wait_for_zenoh() {
-    echo "Waiting for the Zenoh router to be running..."
-
-    # Wait for the router port (see zenoh/ROUTER_CONFIG.json5) to accept connections
-    while ! (echo >/dev/tcp/127.0.0.1/7447) 2>/dev/null; do
-        sleep 1
-    done
-
-    echo "Zenoh router is running."
-}
-
-run_in_pixi() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash -c "$1"
-}
-
-open_pixi_shell() {
-    pixi run --manifest-path "$WS_PATH/pixi.toml" bash --rcfile "$WS_PATH/pixi/bashrc" -i
-}
-
 start_zenoh() {
     if pgrep -x rmw_zenohd >/dev/null; then
         echo "Zenoh router is already running."
@@ -55,7 +26,7 @@ start_zenoh() {
     fi
 
     echo "Starting Zenoh router..."
-    pixi run --manifest-path "$WS_PATH/pixi.toml" zenoh
+    pixi run zenoh
 }
 
 stop_session() {
@@ -85,7 +56,7 @@ case "${1:-}" in
     terminal)
         wait_for_zenoh
         echo "Opening shell in the pixi environment..."
-        open_pixi_shell
+        pixi run workshop-shell
         exit $?
         ;;
 
@@ -97,24 +68,21 @@ case "${1:-}" in
     teleop)
         wait_for_zenoh
         echo "Starting TurtleBot3 Burger teleop..."
-        run_in_pixi "ros2 run turtlebot3_teleop teleop_keyboard --ros-args -p use_sim_time:=true"
+        pixi run teleop --ros-args -p use_sim_time:=true
         exit $?
         ;;
 
     gazebo)
         wait_for_zenoh
         echo "Starting TurtleBot3 Burger Gazebo..."
-        # gz sim survives the SIGHUP sent when the tmux session is killed,
-        # so take down this pane's whole process group on exit
-        trap 'kill -TERM -- -$$' EXIT
-        run_in_pixi "ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py"
+        run_gazebo
         exit $?
         ;;
 
     rviz)
         wait_for_zenoh
         echo "Starting RViz2..."
-        run_in_pixi "ros2 run rviz2 rviz2 -d '$WS_PATH/config/default.rviz' --ros-args -p use_sim_time:=true"
+        pixi run rviz
         exit $?
         ;;
 
@@ -144,17 +112,7 @@ esac
 # └────────────────────────────────────────────────────┘
 # ================================================================
 
-if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-    exec tmux attach-session -t "$SESSION_NAME"
-fi
-
-# Install the pixi environment before starting any panes
-pixi install --manifest-path "$WS_PATH/pixi.toml" || exit 1
-
-tmux new-session -d -s "$SESSION_NAME"
-
-# Main / Gazebo
-MAIN_PANE=$(tmux display-message -p -t "$SESSION_NAME:0.0" '#{pane_id}')
+new_session
 
 
 # Main / Teleop
@@ -177,21 +135,11 @@ T_3=$(tmux split-window \
 # Start pane processes
 # ================================================================
 
-tmux send-keys -t "$MAIN_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$ZENOH_PANE" \
-    "bash '$SCRIPT_PATH' zenoh" C-m
-
-tmux send-keys -t "$EMPTY_PANE" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$T_2" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
-tmux send-keys -t "$T_3" \
-    "bash '$SCRIPT_PATH' terminal" C-m
-
+start_pane "$MAIN_PANE" terminal
+start_pane "$ZENOH_PANE" zenoh
+start_pane "$EMPTY_PANE" terminal
+start_pane "$T_2" terminal
+start_pane "$T_3" terminal
 
 # Start with keyboard focus on Teleop.
 tmux select-pane -t "$MAIN_PANE"
