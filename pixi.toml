@@ -1,7 +1,7 @@
 [workspace]
 name = "ros2-workshop-turtlebot3"
 description = "ROS 2 Turtlebot 3 Jazzy workshop environment"
-channels = ["https://prefix.dev/robostack-jazzy", "https://prefix.dev/conda-forge"]
+channels = ["https://prefix.dev/robostack-jazzy"]
 platforms = [
     "linux-64",
     "linux-aarch64",
@@ -9,12 +9,15 @@ platforms = [
 ]
 preview = ["pixi-build"]
 
+# Pin the ROS distro mutex used by the source-built packages (apriltag_ros,
+# cartographer_ros). ros-gz <1.0.25 has no builds for mutex 0.21.
+[workspace.build-variants]
+ros2-distro-mutex = ["0.20.*"]
+
 [dependencies]
 # Core dependencies
 ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
-# Newer versions break `colcon build --symlink-install` for ament_python packages
-setuptools = "<80"
 # Build tools for ament_cmake packages (apriltag_find_interfaces)
 compilers = "*"
 cmake = "<4"
@@ -50,6 +53,9 @@ ros-jazzy-turtlebot3 = "*"
 ros-jazzy-turtlebot3-gazebo = "*"
 ros-jazzy-turtlebot3-msgs = "*"
 ros-jazzy-dynamixel-sdk = "*"
+# TODO: some kind of shared library bug on linux, pending investigation
+ros2-ros-gz-image = "<1.0.25"
+ros2-ros-gz-bridge = "<1.0.25"
 
 [activation]
 scripts = ["pixi/activate.sh"]
