@@ -1,5 +1,6 @@
-# apriltag_ros built from source: the robostack-jazzy binary can't be installed
-# alongside the rest of the workshop dependencies, and has no osx-arm64 build.
+# apriltag_ros built from source: on Linux the robostack-jazzy binary depends on
+# camera_ros -> libcamera, which needs gstreamer 1.28, while Qt 5 (rviz, rqt,
+# Gazebo) is still pinned to gstreamer 1.26 on conda-forge.
 [package]
 name = "ros-jazzy-apriltag-ros"
 version = "3.4.0"
