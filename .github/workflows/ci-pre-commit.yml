@@ -1,4 +1,5 @@
 name: Pre-commit
+# The pre-commit configuration is in .pre-commit-config.yaml
 
 on:
   workflow_dispatch:
@@ -6,6 +7,14 @@ on:
 
 jobs:
   pre-commit:
-    uses: ./.github/workflows/reusable-pre-commit.yml
-    with:
-      ros_distro: jazzy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.11.3
+        with:
+          environments: lint
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ hashFiles('.pre-commit-config.yaml') }}
+      - run: pixi run -e lint lint --color=always
